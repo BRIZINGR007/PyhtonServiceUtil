@@ -2,7 +2,7 @@ import boto3
 import json
 from typing import final, Dict
 from decouple import config
-from typing import TypedDict, Required, Any
+from typing import TypedDict, Required, Any, cast
 import uuid
 
 from .helpers import Helpers
@@ -33,9 +33,11 @@ DefaultContext = {
 
 @final
 class SyncSQSPusher:
-    aws_access_key_id: str = str(config("AWS_ACCESS_KEY_ID"))
-    aws_secret_access_key: str = str(config("AWS_SECRET_ACCESS_KEY"))
-    aws_region_name: str = str(config("AWS_REGION_NAME"))
+    aws_access_key_id: str = cast(str, config("AWS_ACCESS_KEY_ID", default=False))
+    aws_secret_access_key: str = cast(
+        str, config("AWS_SECRET_ACCESS_KEY", default=False)
+    )
+    aws_region_name: str = cast(str, config("AWS_REGION_NAME", default=False))
     queue_config: Dict[str, Dict[str, bool]] = QUEUE_CONFIG
 
     def __construct_message_body(
