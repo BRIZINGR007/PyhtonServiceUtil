@@ -5,6 +5,7 @@ from .clients.sqs_client.post_message import SyncSQSPusher
 from .clients.sqs_client.polling import SQS_Manager
 from .clients.sqs_client.initiator import SQSInitiator
 from .logging.base_logger import APP_LOGGER
+from .logging.logger_decorator import LogExecution
 from .middlewares.message_middlewares import MessageMiddleware
 from .middlewares.rest_middlewares import (
     HeaderValidationMiddleware,
