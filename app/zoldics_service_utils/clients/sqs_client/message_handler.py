@@ -1,12 +1,12 @@
 import json
 import asyncio
 from functools import partial
-from logging.base_logger import APP_LOGGER
 from typing import Dict, final, List, Union, Callable, Awaitable
 from types import MethodType
 
-from interfaces.interfaces_th import SQSClientCallBackResponse_TH
-from ioc.singleton import Para_SingletonMeta
+from ...logging.base_logger import APP_LOGGER
+from ...interfaces.interfaces_th import SQSClientCallBackResponse_TH
+from ...ioc.singleton import Para_SingletonMeta
 
 
 @final

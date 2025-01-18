@@ -3,8 +3,9 @@ import asyncio
 import botocore.exceptions
 from aiobotocore.session import get_session
 from typing import final, Dict, Any, List
-from clients.sqs_client.message_handler import MessageHandler
-from logging.base_logger import APP_LOGGER
+
+from .message_handler import MessageHandler
+from ...logging.base_logger import APP_LOGGER
 
 
 @final

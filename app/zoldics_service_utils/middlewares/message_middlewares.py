@@ -4,11 +4,11 @@ from typing import Any, Dict, Type, cast
 from pydantic import BaseModel
 from decouple import config
 
-from context.vars import headers_context, payload_context
-from interfaces.interfaces_pd import Headers_PM
-from interfaces.interfaces_th import Headers_TH
-from utils.jwt_validation import JwtValdationUtils
-from logging.base_logger import APP_LOGGER
+from ..context.vars import headers_context, payload_context
+from ..interfaces.interfaces_pd import Headers_PM
+from ..interfaces.interfaces_th import Headers_TH
+from ..utils.jwt_validation import JwtValdationUtils
+from ..logging.base_logger import APP_LOGGER
 
 
 class MessageMiddleware:

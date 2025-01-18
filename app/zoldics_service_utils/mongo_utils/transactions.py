@@ -1,13 +1,10 @@
 from decouple import config
 from mongoengine import get_connection
-
 from pymongo import MongoClient
 from pymongo.client_session import ClientSession
 import contextvars
 from typing import Optional, Any, Type, TypeVar, cast
 from contextlib import suppress
-
-T = TypeVar("T")
 
 # Global context variable for MongoDB session
 mongo_session_context: contextvars.ContextVar[Optional[ClientSession]] = (

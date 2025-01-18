@@ -5,7 +5,7 @@ import pytz
 from decouple import config
 
 # modules
-from context.vars import (
+from ..context.vars import (
     headers_context,
     request_context,
     payload_context,

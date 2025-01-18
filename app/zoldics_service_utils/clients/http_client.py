@@ -2,7 +2,7 @@ import requests
 from decouple import config
 import uuid
 from typing import Optional, Dict
-from logging.base_logger import APP_LOGGER
+from ..logging.base_logger import APP_LOGGER
 
 
 class HttpClient:

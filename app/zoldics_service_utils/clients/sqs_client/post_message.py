@@ -2,12 +2,13 @@ import boto3
 import json
 from typing import final, Dict
 from decouple import config
-from clients.sqs_client.helpers import Helpers
-from clients.sqs_client.queue_config import QUEUE_CONFIG
-from logging.base_logger import APP_LOGGER
-from context.vars import headers_context
 from typing import TypedDict, Required, Any
 import uuid
+
+from .helpers import Helpers
+from .queue_config import QUEUE_CONFIG
+from ...logging.base_logger import APP_LOGGER
+from ...context.vars import headers_context
 
 
 class Message_Payload_TypeHinter(TypedDict, total=False):

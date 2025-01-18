@@ -7,19 +7,19 @@ from decouple import config
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from decouple import config
+from starlette.types import ASGIApp, Scope, Receive, Send
 
 # modules
 
-from interfaces.interfaces_pd import Headers_PM, RequestContext_PM
-from utils.jwt_validation import JwtValdationUtils
-from logging.base_logger import APP_LOGGER
-from context.vars import (
+from ..interfaces.interfaces_pd import Headers_PM, RequestContext_PM
+from ..utils.jwt_validation import JwtValdationUtils
+from ..logging.base_logger import APP_LOGGER
+from ..context.vars import (
     headers_context,
     request_context,
     request_params_context,
     payload_context,
 )
-from starlette.types import ASGIApp, Scope, Receive, Send
 
 
 class HeaderValidationMiddleware:
