@@ -4,9 +4,8 @@ import json
 import sys
 import traceback
 from decouple import config
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 from decouple import config
 
 # modules
@@ -20,40 +19,53 @@ from context.vars import (
     request_params_context,
     payload_context,
 )
+from starlette.types import ASGIApp, Scope, Receive, Send
 
 
-class HeaderValidationMiddleware(BaseHTTPMiddleware):
+class HeaderValidationMiddleware:
     def __init__(
         self,
-        app: FastAPI,
+        app: ASGIApp,
+        x_api_key_1: str,
+        x_api_key_2: str,
         excluded_paths: FrozenSet[str] = frozenset(),
         authexpiryignore_paths: FrozenSet[str] = frozenset(),
     ):
-        super().__init__(app)
+        self.app = app
+        self.x_api_key_1 = x_api_key_1
+        self.x_api_key_2 = x_api_key_2
         self.excluded_paths: FrozenSet[str] = frozenset(
             {"/docs", "/openapi.json", *excluded_paths}
         )
-
         self.authexpiryignore_paths: FrozenSet[str] = frozenset(authexpiryignore_paths)
 
-    async def dispatch(self, request: Request, call_next):
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+
+        request = Request(scope, receive)
+
         if any(request.url.path.startswith(path) for path in self.excluded_paths):
-            return await call_next(request)
+            await self.app(scope, receive, send)
+
         headers = request.headers
         access_token = None
         verify_exp = True
         should_ignore_expiry = any(
             request.url.path.startswith(path) for path in self.authexpiryignore_paths
         )
+
         if "access_token" in request.cookies:
             access_token = request.cookies.get("access_token")
             verify_exp = not should_ignore_expiry
         elif "authorization" in headers:
             access_token = headers.get("authorization")
             verify_exp = not should_ignore_expiry
+
         access_token = request.cookies.get("access_token") or headers.get(
             "authorization"
         )
+
         try:
             if access_token:
                 payload = JwtValdationUtils.validate_token(
@@ -67,11 +79,12 @@ class HeaderValidationMiddleware(BaseHTTPMiddleware):
                     )
                 )
                 headers_context.set(headers_model)
-                return await call_next(request)
+                return await self.app(scope, receive, send)
 
-            if headers.get("x-api-key-2") == config(
-                "X_API_KEY_PUBSUB-SERVICE_2"
-            ) or headers.get("x-api-key-1") == config("X_API_KEY_PUBSUB-SERVICE_1"):
+            if (
+                headers.get("x-api-key-1") == self.x_api_key_1
+                or headers.get("x-api-key-2") == self.x_api_key_2
+            ):
                 headers_model = Headers_PM(
                     **dict(
                         correlationid=headers.get("correlationid", str(uuid.uuid4())),
@@ -80,22 +93,32 @@ class HeaderValidationMiddleware(BaseHTTPMiddleware):
                     )
                 )
                 headers_context.set(headers_model)
-                return await call_next(request)
+                await self.app(scope, receive, send)
 
-            return JSONResponse(
+            # Handle unauthorized case
+            response = JSONResponse(
                 {"detail": "Unauthorized: Missing or invalid credentials."},
                 status_code=401,
             )
+            await response(scope, receive, send)
 
         except HTTPException as e:
-            raise e
+            response = JSONResponse(
+                {"detail": str(e.detail)},
+                status_code=e.status_code,
+            )
+            await response(scope, receive, send)
         except Exception as e:
             APP_LOGGER.error(f"Unexpected error in token validation: {str(e)}")
-            raise HTTPException(status_code=500, detail="Internal server error")
+            response = JSONResponse(
+                {"detail": "Internal server error"},
+                status_code=500,
+            )
+            await response(scope, receive, send)
 
 
 class ExceptionMiddleware:
-    def __init__(self, app):
+    def __init__(self, app: ASGIApp):
         self.app = app
 
     def log_exception(self):
@@ -122,7 +145,7 @@ class ExceptionMiddleware:
                 }
                 APP_LOGGER.error(json.dumps(error_data))
 
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
         try:
             await self.app(scope, receive, send)
         except HTTPException as http_exception:
@@ -133,12 +156,17 @@ class ExceptionMiddleware:
             await self.handle_internal_server_error(e, scope, receive, send)
 
     async def handle_http_exception(self, http_exception, scope, receive, send):
-        await http_exception(scope, receive, send)
+        response = JSONResponse(
+            {"detail": http_exception.detail},
+            status_code=http_exception.status_code,
+        )
+        await response(scope, receive, send)
 
     async def handle_internal_server_error(self, exception, scope, receive, send):
-        error_message = dict(
-            detail="Internal Server Error", error_message=str(exception)
-        )
+        error_message = {
+            "detail": "Internal Server Error",
+            "error_message": str(exception),
+        }
         response = JSONResponse(status_code=500, content=error_message)
         await response(scope, receive, send)
 

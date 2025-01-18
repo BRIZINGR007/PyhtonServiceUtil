@@ -10,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="zoldics_service_utils",
-    version="0.0.2",
+    version="0.0.4",
     author="Nabarka_Deb",
     description="A most utile package for the governance of pythonic micro-services",
     long_description=long_description,
