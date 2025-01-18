@@ -1,7 +1,7 @@
 import json
 import asyncio
 from functools import partial
-from service_utils.logging.base_logger import APP_LOGGER
+from logging.base_logger import APP_LOGGER
 from typing import Dict, final, List, Union, Callable, Awaitable
 from types import MethodType
 

@@ -1,5 +1,4 @@
-from statistics import correlation
-from typing import FrozenSet, Set
+from typing import FrozenSet
 import uuid
 import json
 import sys
@@ -7,23 +6,20 @@ import traceback
 from decouple import config
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from decouple import config
+
+# modules
+
+from service_utils.interfaces.interfaces_pd import Headers_PM, RequestContext_PM
+from service_utils.utils.jwt_validation import JwtValdationUtls
+from service_utils.logging.base_logger import APP_LOGGER
 from service_utils.context.vars import (
     headers_context,
     request_context,
     request_params_context,
     payload_context,
 )
-
-# modules
-
-from app.interfaces.pd_interfaces import (
-    Headers_PM,
-    RequestContext_PM,
-)
-from service_utils.utils.jwt_validation import JwtValdationUtls
-from service_utils.logging.base_logger import APP_LOGGER
-from starlette.middleware.base import BaseHTTPMiddleware
-from decouple import config
 
 
 class HeaderValidationMiddleware(BaseHTTPMiddleware):

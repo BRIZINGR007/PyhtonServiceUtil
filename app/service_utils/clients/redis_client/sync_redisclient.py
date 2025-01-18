@@ -3,7 +3,7 @@ from typing import Any, List, Optional, cast
 from service_utils.ioc.singleton import SingletonMeta
 
 
-class RedisClient(metaclass=SingletonMeta):
+class SyncRedisClient(metaclass=SingletonMeta):
 
     def __init__(
         self,

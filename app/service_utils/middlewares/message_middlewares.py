@@ -1,14 +1,13 @@
 from typing import Any, Dict, Type, cast
 
 from pydantic import BaseModel
-from websockets import Headers
-from app.interfaces.pd_interfaces import Headers_PM
 from service_utils.context.vars import headers_context, payload_context
+from service_utils.interfaces.interfaces_pd import Headers_PM
 from service_utils.interfaces.interfaces_th import Headers_TH
 from service_utils.utils.jwt_validation import JwtValdationUtls
 
 
-class BrokerMiddleware:
+class MessageMiddleware:
     @staticmethod
     def validate_set_context(
         payload: Dict[str, Any],
