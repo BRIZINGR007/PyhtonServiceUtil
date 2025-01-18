@@ -13,11 +13,9 @@ evaluation-service=yourname-evaluation-service
 
 
 class QUEUE_NAMES:
-    EMBEDDING_SERVICE = "embedding-service"
-    EVALUATION_SERVICE = "evaluation-service"
+    EMAIL_SERVICE = "app001emailservice"
 
 
 QUEUE_CONFIG: Dict[str, Dict[str, bool]] = {
-    QUEUE_NAMES.EMBEDDING_SERVICE: dict(fifo=False),
-    QUEUE_NAMES.EVALUATION_SERVICE: dict(fifo=False),
+    QUEUE_NAMES.EMAIL_SERVICE: dict(fifo=False),
 }
