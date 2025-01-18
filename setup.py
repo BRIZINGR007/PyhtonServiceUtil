@@ -16,6 +16,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",
+    url="https://github.com/BRIZINGR007/PyhtonServiceUtil",
     package_dir={"": "app"},
     packages=find_packages(where="app"),
     install_requires=requirements,
