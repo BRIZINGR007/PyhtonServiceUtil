@@ -16,10 +16,14 @@ class JwtValdationUtils:
     JWT_ALGORITHM = "RS256" if config("AUTH_TOKEN_ALGORITHM") == "RS256" else "HS256"
 
     @staticmethod
-    def is_token_expired(exp_timestamp: float) -> bool:
-        exp_datetime = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
-        current_time = datetime.now(timezone.utc)
-        return exp_datetime < current_time
+    def is_token_expired(token: str) -> bool:
+        try:
+            JwtValdationUtils.validate_token(token, verify_exp=True)
+            return False
+        except HTTPException as e:
+            if e.status_code == 401 and e.detail == "Token has expired":
+                return True
+            raise e
 
     @lru_cache(maxsize=1)
     @staticmethod
