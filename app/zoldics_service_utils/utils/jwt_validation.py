@@ -42,9 +42,9 @@ class JwtValdationUtils:
     ) -> Dict:
         try:
             default_options = dict()
-            if verify_exp:
+            if not verify_exp:
                 default_options.update(verify_exp=False)
-            if verify_aud:
+            if not verify_aud:
                 default_options.update(verify_aud=False)
 
             unverified_header = jwt.get_unverified_header(token)
