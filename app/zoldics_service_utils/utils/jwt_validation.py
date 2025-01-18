@@ -6,7 +6,6 @@ from jwcrypto import jwk
 import jwt
 from decouple import config
 from typing import Dict, List, Optional
-from datetime import datetime, timezone
 
 from ..interfaces.interfaces_th import Jwk_TH
 from ..logging.base_logger import APP_LOGGER
