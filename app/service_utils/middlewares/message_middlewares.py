@@ -7,7 +7,7 @@ from decouple import config
 from service_utils.context.vars import headers_context, payload_context
 from service_utils.interfaces.interfaces_pd import Headers_PM
 from service_utils.interfaces.interfaces_th import Headers_TH
-from service_utils.utils.jwt_validation import JwtValdationUtls
+from service_utils.utils.jwt_validation import JwtValdationUtils
 from service_utils.logging.base_logger import APP_LOGGER
 
 
@@ -20,7 +20,7 @@ class MessageMiddleware:
     ):
         try:
             if headers.get("authorization"):
-                JwtValdationUtls.validate_token(
+                JwtValdationUtils.validate_token(
                     token=cast(str, headers.get("authorization")),
                     verify_aud=False,
                     verify_exp=False,

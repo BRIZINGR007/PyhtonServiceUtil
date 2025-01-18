@@ -12,7 +12,7 @@ from service_utils.interfaces.interfaces_th import Jwk_TH
 from service_utils.logging.base_logger import APP_LOGGER
 
 
-class JwtValdationUtls:
+class JwtValdationUtils:
     JWT_ALGORITHM = "RS256" if config("AUTH_TOKEN_ALGORITHM") == "RS256" else "HS256"
 
     @staticmethod
