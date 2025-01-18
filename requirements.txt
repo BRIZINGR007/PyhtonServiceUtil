@@ -14,3 +14,4 @@ fastapi==0.115.6
 python-decouple==3.8
 fastapi==0.115.6
 mongoengine==0.29.1
+futures==3.4.0

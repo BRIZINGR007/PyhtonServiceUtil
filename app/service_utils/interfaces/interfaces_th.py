@@ -10,7 +10,7 @@ class Jwk_TH(TypedDict, total=False):
     use: str
 
 
-class Headers_TH(TypedDict, total=False):
+class Headers_TH(TypedDict):
     correlationid: str
     username: str
     authorization: str
