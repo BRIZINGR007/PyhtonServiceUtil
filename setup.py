@@ -9,10 +9,12 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="service_utils",
+    name="zoldics_service_utils",
     version="0.0.1",
-    author="Brizingr Zoldic",
+    author="Nabarka_Deb",
     description="A most utile package for the governance of pythonic micro-services",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     license="MIT",
     package_dir={"": "app"},
     packages=find_packages(where="app"),

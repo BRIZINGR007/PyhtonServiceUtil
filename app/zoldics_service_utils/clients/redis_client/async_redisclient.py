@@ -1,8 +1,8 @@
 import asyncio
 from redis.asyncio import Redis
 from typing import AsyncGenerator, Optional
-from service_utils.interfaces.interfaces_th import SSEMessage_TH
-from service_utils.ioc.singleton import SingletonMeta
+from interfaces.interfaces_th import SSEMessage_TH
+from ioc.singleton import SingletonMeta
 import json
 
 

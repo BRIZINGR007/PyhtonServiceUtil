@@ -2,10 +2,10 @@ import boto3
 import json
 from typing import final, Dict
 from decouple import config
-from service_utils.clients.sqs_client.helpers import Helpers
-from service_utils.clients.sqs_client.queue_config import QUEUE_CONFIG
-from service_utils.logging.base_logger import APP_LOGGER
-from service_utils.context.vars import headers_context
+from clients.sqs_client.helpers import Helpers
+from clients.sqs_client.queue_config import QUEUE_CONFIG
+from logging.base_logger import APP_LOGGER
+from context.vars import headers_context
 from typing import TypedDict, Required, Any
 import uuid
 

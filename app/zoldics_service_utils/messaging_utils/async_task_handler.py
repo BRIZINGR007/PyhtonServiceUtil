@@ -6,11 +6,11 @@ from typing import Any, Dict, Generic, Type, TypeVar
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from service_utils.interfaces.interfaces_th import (
+from interfaces.interfaces_th import (
     Headers_TH,
     SQSClientCallBackResponse_TH,
 )
-from service_utils.middlewares.message_middlewares import (
+from middlewares.message_middlewares import (
     MessageMiddleware,
     ExceptionLogger,
 )

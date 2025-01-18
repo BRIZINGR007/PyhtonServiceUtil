@@ -1,6 +1,6 @@
 from redis import Redis
 from typing import Any, List, Optional, cast
-from service_utils.ioc.singleton import SingletonMeta
+from ioc.singleton import SingletonMeta
 
 
 class SyncRedisClient(metaclass=SingletonMeta):

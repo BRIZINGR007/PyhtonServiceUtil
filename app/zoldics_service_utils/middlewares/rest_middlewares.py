@@ -11,10 +11,10 @@ from decouple import config
 
 # modules
 
-from service_utils.interfaces.interfaces_pd import Headers_PM, RequestContext_PM
-from service_utils.utils.jwt_validation import JwtValdationUtils
-from service_utils.logging.base_logger import APP_LOGGER
-from service_utils.context.vars import (
+from interfaces.interfaces_pd import Headers_PM, RequestContext_PM
+from utils.jwt_validation import JwtValdationUtils
+from logging.base_logger import APP_LOGGER
+from context.vars import (
     headers_context,
     request_context,
     request_params_context,

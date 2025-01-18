@@ -2,10 +2,10 @@ import boto3
 from typing import List, Callable, Awaitable
 from typing import Dict
 
-from service_utils.clients.sqs_client.helpers import Helpers
-from service_utils.clients.sqs_client.message_handler import MessageHandler
-from service_utils.clients.sqs_client.polling import SQS_Manager
-from service_utils.ioc.singleton import SingletonMeta
+from clients.sqs_client.helpers import Helpers
+from clients.sqs_client.message_handler import MessageHandler
+from clients.sqs_client.polling import SQS_Manager
+from ioc.singleton import SingletonMeta
 
 # modules
 

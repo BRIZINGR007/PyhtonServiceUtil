@@ -5,8 +5,8 @@ from logging.base_logger import APP_LOGGER
 from typing import Dict, final, List, Union, Callable, Awaitable
 from types import MethodType
 
-from service_utils.interfaces.interfaces_th import SQSClientCallBackResponse_TH
-from service_utils.ioc.singleton import Para_SingletonMeta
+from interfaces.interfaces_th import SQSClientCallBackResponse_TH
+from ioc.singleton import Para_SingletonMeta
 
 
 @final

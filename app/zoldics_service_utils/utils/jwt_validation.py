@@ -8,8 +8,8 @@ from decouple import config
 from typing import Dict, List, Optional
 from datetime import datetime, timezone
 
-from service_utils.interfaces.interfaces_th import Jwk_TH
-from service_utils.logging.base_logger import APP_LOGGER
+from interfaces.interfaces_th import Jwk_TH
+from logging.base_logger import APP_LOGGER
 
 
 class JwtValdationUtils:
