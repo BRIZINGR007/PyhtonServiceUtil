@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import Dict
 
 """
@@ -12,7 +13,7 @@ evaluation-service=yourname-evaluation-service
 """
 
 
-class QUEUE_NAMES:
+class QUEUE_NAMES(StrEnum):
     EMAIL_SERVICE = "app001emailservice"
 
 

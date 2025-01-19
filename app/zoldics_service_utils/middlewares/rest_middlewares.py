@@ -41,12 +41,12 @@ class HeaderValidationMiddleware:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         if scope["type"] != "http":
-            await self.app(scope, receive, send)
+            return await self.app(scope, receive, send)
 
         request = Request(scope, receive)
 
         if any(request.url.path.startswith(path) for path in self.excluded_paths):
-            await self.app(scope, receive, send)
+            return await self.app(scope, receive, send)
 
         headers = request.headers
         access_token = None
@@ -93,28 +93,27 @@ class HeaderValidationMiddleware:
                     )
                 )
                 headers_context.set(headers_model)
-                await self.app(scope, receive, send)
+                return await self.app(scope, receive, send)
 
             # Handle unauthorized case
             response = JSONResponse(
                 {"detail": "Unauthorized: Missing or invalid credentials."},
                 status_code=401,
             )
-            await response(scope, receive, send)
-
+            return await response(scope, receive, send)
         except HTTPException as e:
             response = JSONResponse(
                 {"detail": str(e.detail)},
                 status_code=e.status_code,
             )
-            await response(scope, receive, send)
+            return await response(scope, receive, send)
         except Exception as e:
             APP_LOGGER.error(f"Unexpected error in token validation: {str(e)}")
             response = JSONResponse(
                 {"detail": "Internal server error"},
                 status_code=500,
             )
-            await response(scope, receive, send)
+            return await response(scope, receive, send)
 
 
 class ExceptionMiddleware:
