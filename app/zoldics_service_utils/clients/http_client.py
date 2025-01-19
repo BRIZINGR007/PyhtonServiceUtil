@@ -1,6 +1,5 @@
 import requests
 from decouple import config
-import uuid
 from typing import Optional, Dict
 
 
@@ -13,14 +12,12 @@ class HttpClient:
         path_params: Optional[Dict[str, str]] = None,
         query_params: Optional[Dict[str, str]] = None,
         interServiceCall: bool = False,
-        localhostCall: bool = False,
-        portNumber: str = str(config("PORT")),
+        portNumber: Optional[str] = None,
     ) -> None:
         self.interServiceCall = interServiceCall
-        self.localhostCall = localhostCall
-        self.__environment: str = str(config("ENVIRONMENT"))
-        self.__domain: str = str(config("DOMAIN"))
-        self.__portnumber: str = portNumber
+        self.__environment: str = str(config("ENVIRONMENT", default=""))
+        self.__domain: str = str(config("DOMAIN", default=""))
+        self.__portnumber: Optional[str] = portNumber
         self.__headers = headers
         self.__path = path
         self.__body = body
