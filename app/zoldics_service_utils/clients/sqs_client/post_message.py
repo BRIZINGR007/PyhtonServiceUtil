@@ -3,32 +3,18 @@ import json
 from typing import final, Dict
 from decouple import config
 from typing import TypedDict, Required, Any, cast
-import uuid
+
+from ...utils.context_utils import ContextUtils
 
 from .helpers import Helpers
 from .queue_config import QUEUE_CONFIG
 from ...logging.base_logger import APP_LOGGER
-from ...context.vars import headers_context
 
 
 class Message_Payload_TypeHinter(TypedDict, total=False):
     action: Required[str]
     payload: Dict[str, Any]
     context: Dict[str, Any]
-
-
-DefaultContext = {
-    "instanceid": "not-applicable",
-    "organizationid": "Embedding-Service",
-    "caller": "not-applicable",
-    "ipaddress": "not-applicable",
-    "origin": "not-applicable",
-    "origintype": "not-applicable",
-    "userid": "not-applicable",
-    "sessionid": "not-applicable",
-    "usertype": "not-applicable",
-    "correlationid": str(uuid.uuid4()),
-}
 
 
 @final
@@ -43,8 +29,8 @@ class SyncSQSPusher:
     def __construct_message_body(
         self, action: str, payload: Dict[str, Any]
     ) -> Message_Payload_TypeHinter:
-        message_context = (
-            headers_context.get().model_dump(mode="json") or DefaultContext
+        message_context = ContextUtils.get_user_details_from_headers().model_dump(
+            mode="json"
         )
         message_payload = Message_Payload_TypeHinter(
             action=action, context=message_context, payload=payload

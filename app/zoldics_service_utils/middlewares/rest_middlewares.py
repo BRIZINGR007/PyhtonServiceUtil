@@ -39,32 +39,28 @@ class HeaderValidationMiddleware:
         )
         self.authexpiryignore_paths: FrozenSet[str] = frozenset(authexpiryignore_paths)
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send):
-        if scope["type"] != "http":
-            return await self.app(scope, receive, send)
-
-        request = Request(scope, receive)
-
-        if any(request.url.path.startswith(path) for path in self.excluded_paths):
-            return await self.app(scope, receive, send)
-
-        headers = request.headers
+    async def validate_headers(self, headers, path: str) -> tuple[bool, dict, int]:
+        """Helper method to validate headers for both HTTP and WebSocket."""
         access_token = None
         verify_exp = True
         should_ignore_expiry = any(
-            request.url.path.startswith(path) for path in self.authexpiryignore_paths
+            path.startswith(excluded_path)
+            for excluded_path in self.authexpiryignore_paths
         )
 
-        if "access_token" in request.cookies:
-            access_token = request.cookies.get("access_token")
+        # Check for access token in headers
+        if "access_token" in headers.get("cookie", ""):
+            # Parse cookie string to get access token
+            cookies = dict(
+                cookie.split("=")
+                for cookie in headers.get("cookie", "").split("; ")
+                if cookie
+            )
+            access_token = cookies.get("access_token")
             verify_exp = not should_ignore_expiry
         elif "authorization" in headers:
-            access_token = headers.get("authorization")
+            access_token = headers["authorization"]
             verify_exp = not should_ignore_expiry
-
-        access_token = request.cookies.get("access_token") or headers.get(
-            "authorization"
-        )
 
         try:
             if access_token:
@@ -79,7 +75,7 @@ class HeaderValidationMiddleware:
                     )
                 )
                 headers_context.set(headers_model)
-                return await self.app(scope, receive, send)
+                return True, {}, 200
 
             if (
                 headers.get("x-api-key-1") == self.x_api_key_1
@@ -93,27 +89,52 @@ class HeaderValidationMiddleware:
                     )
                 )
                 headers_context.set(headers_model)
-                return await self.app(scope, receive, send)
+                return True, {}, 200
 
-            # Handle unauthorized case
-            response = JSONResponse(
+            return (
+                False,
                 {"detail": "Unauthorized: Missing or invalid credentials."},
-                status_code=401,
+                401,
             )
-            return await response(scope, receive, send)
+
         except HTTPException as e:
-            response = JSONResponse(
-                {"detail": str(e.detail)},
-                status_code=e.status_code,
-            )
-            return await response(scope, receive, send)
+            return False, {"detail": str(e.detail)}, e.status_code
         except Exception as e:
             APP_LOGGER.error(f"Unexpected error in token validation: {str(e)}")
-            response = JSONResponse(
-                {"detail": "Internal server error"},
-                status_code=500,
-            )
-            return await response(scope, receive, send)
+            return False, {"detail": "Internal server error"}, 500
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] not in ["http", "websocket"]:
+            return await self.app(scope, receive, send)
+
+        path = scope["path"]
+        if any(path.startswith(excluded_path) for excluded_path in self.excluded_paths):
+            return await self.app(scope, receive, send)
+
+        headers = dict(scope["headers"])
+        headers = {k.decode(): v.decode() for k, v in headers.items()}
+
+        is_valid, error_detail, status_code = await self.validate_headers(headers, path)
+
+        if not is_valid:
+            if scope["type"] == "http":
+                response = JSONResponse(error_detail, status_code=status_code)
+                return await response(scope, receive, send)
+            else:
+
+                async def close_websocket():
+                    await send(
+                        {
+                            "type": "websocket.close",
+                            "code": 4000
+                            + status_code,  # Using 4000 + HTTP status code as WebSocket close code
+                            "reason": error_detail["detail"],
+                        }
+                    )
+
+                return await close_websocket()
+
+        return await self.app(scope, receive, send)
 
 
 class ExceptionMiddleware:
