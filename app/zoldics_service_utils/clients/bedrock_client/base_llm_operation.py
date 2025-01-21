@@ -1,11 +1,15 @@
 import re
 from fastapi.responses import StreamingResponse
-from abc import ABC
+from abc import ABC, abstractmethod
 import json
 from typing import Optional, Dict, List
 
 from .bedrock_client import GenerateBedrockResponse
-from ...interfaces.interfaces_th import LLM_HyperParameters_TH, LLM_ClientPayload_TH
+from ...interfaces.interfaces_th import (
+    LLM_HyperParameters_TH,
+    LLM_ClientPayload_TH,
+    LLM_PromptTemplates_TH,
+)
 from .foundation_models import FoundationModels
 from ...logging.base_logger import APP_LOGGER
 
@@ -82,3 +86,29 @@ class LLMOperation(ABC):
                 return json_response
             APP_LOGGER.warning(f"Attempt {attempt + 1}: Failed to extract JSON.")
         raise ValueError(f"Failed to extract JSON after {max_retries} attempts.")
+
+
+class BaseAIEventsConfig(ABC):
+    """Abstract base class for all AI event configurations subtypes."""
+
+    @staticmethod
+    @abstractmethod
+    def MODEL_HYPERPARAMETERS(
+        *args, **kwargs
+    ) -> Dict[FoundationModels, LLM_HyperParameters_TH]:
+        """Abstract property for model parameters. Must be implemented by subclasses."""
+        raise NotImplementedError("Subclasses must implement MODEL_HYPERPARAMETERS")
+
+    @staticmethod
+    @abstractmethod
+    def MODEL_PROMPTS(
+        *args, **kwargs
+    ) -> Dict[FoundationModels, LLM_PromptTemplates_TH]:
+        """Abstract property for prompts. Must be implemented by subclasses."""
+        raise NotImplementedError("Subclasses must implement MODEL_PROMPTS")
+
+    @staticmethod
+    @abstractmethod
+    def BASE_OUTPUT_TOKENS() -> int:
+        """Abstract property for output tokens. Must be implemented by subclasses."""
+        raise NotImplementedError("Subclasses must implement BASE_OUTPUT_TOKENS")
