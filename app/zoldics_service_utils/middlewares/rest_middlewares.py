@@ -169,8 +169,6 @@ class ExceptionMiddleware:
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         try:
             await self.app(scope, receive, send)
-        except CancelledError:
-            APP_LOGGER.warning("Request cancelled by the client.")
 
         except HTTPException as http_exception:
             self.log_exception()
