@@ -1,5 +1,11 @@
 from typing import TypedDict, Required, Dict
 
+from typing import TypedDict, List, Dict, Required
+
+from ..clients.bedrock_client.foundation_models import (
+    FoundationModels,
+)
+
 
 class Jwk_TH(TypedDict, total=False):
     alg: Required[str]
@@ -24,3 +30,50 @@ class SSEMessage_TH(TypedDict):
 class SQSClientCallBackResponse_TH(TypedDict):
     allSuccess: bool
     correlationid: str
+
+
+class LLM_HyperParameters_TH(TypedDict, total=False):
+    max_gen_len: int
+    temperature: Required[float]
+    top_p: Required[float]
+    top_k: int
+    max_tokens: int
+    stop: List[str]
+
+
+class LLM_ClientPayload_TH(TypedDict):
+    messages: List[Dict[str, str]]
+    model_hyperparameters: LLM_HyperParameters_TH
+    modelId: FoundationModels
+
+
+class BedrockPayload_TH(TypedDict, total=False):
+    prompt: str
+    max_gen_len: int
+    temperature: Required[float]
+    top_p: Required[float]
+    top_k: int
+    max_tokens: int
+    stop: List[str]
+
+
+class LLM_SpecialTokens_TH(TypedDict):
+    bos_token: str
+    content_start_token: str
+    content_end_token: str
+    eos_token: str
+
+
+class LLM_ModelConfig_TH(TypedDict):
+    modelName: str
+    providerName: str
+    responseStreamingSupported: bool
+    payload_format: BedrockPayload_TH
+    special_tokens: LLM_SpecialTokens_TH
+
+
+class LLM_PromptTemplates_TH(TypedDict, total=False):
+    system_prompt: str
+    user_prompt: Required[str]
+    user_prompt_1: str
+    base_token_count: Required[int]
