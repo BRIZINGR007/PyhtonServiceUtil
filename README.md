@@ -1,25 +1,25 @@
 # PythonServiceUtil
 
-PythonServiceUtil is a utility library designed to streamline Python-based microservice development. It offers robust support for REST inter-service calls, AWS SQS, Redis, and MongoDB, enabling faster, more efficient development workflows.
-
-## Features
+**PythonServiceUtil** is a utility library designed to streamline Python-based microservice development. It offers robust support for:
 
 - **REST Inter-service Calls**: Simplifies HTTP communication between services.
 - **AWS SQS Integration**: Enhances message queue operations.
 - **Redis Support**: Provides efficient caching and data storage.
-- **MongoDB Integration**: Simplifies interactions with MongoDB databases along  with Transactions.
-- **Context Management**: Simplifies Context Managemt in both MultiThreaded and MultiProcessing Environmenets.
+- **MongoDB Integration**: Simplifies database interactions, including transactions (mongoengine object data mapper).
+- **Context Management**: Facilitates seamless context management in multithreaded and multiprocessing environments.
 
 ---
 
-## Validation Workflow
+## Features
 
-The validation process works as follows:
+### Validation Workflow
 
-1. **Access Token Validation**: The primary step validates the access token.
-2. **Fallback to X-API-KEY Validation**: If the access token validation fails, X-API-KEY validation is used.
+The validation process is structured as follows:
 
-**Note**: The JWKS should be in the format `List[Jwk_TH]`. Mention the symmetric or asymmetric algorithm you want to use :AUTH_TOKEN_ALGORITHM
+1. **Access Token Validation**: Validates the access token as the primary step.
+2. **Fallback to X-API-KEY Validation**: If the access token validation fails, X-API-KEY validation is used as a fallback.
+
+> **Note**: The JWKS (JSON Web Key Set) must follow the format `List[Jwk_TH]`. Specify the symmetric or asymmetric algorithm to use via `AUTH_TOKEN_ALGORITHM`.
 
 ```python
 class Jwk_TH(TypedDict, total=False):
@@ -38,7 +38,7 @@ def __load_jwks() -> List[Jwk_TH]:
 
 ## Configuration
 
-Use an `.env` file to configure the library with the following keys:
+Configure the library using an `.env` file with the following keys:
 
 ```plaintext
 ENVIRONMENT=develop
@@ -46,22 +46,20 @@ LOGGING_FILENAME=service.log
 AUTH_TOKEN_ALGORITHM=RS256
 BEDROCK_AWS_REGION_NAME=region_name
 AWS_REGION_NAME=region_name
-AWS_ACCESS_KEY_ID=amazing_access_key
-AWS_SECRET_ACCESS_KEY=amazing_secret_access_key
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
 X_API_KEY_EMBEDDING_SERVICE_1=access_key
 X_API_KEY_EMBEDDING_SERVICE_2=access_key
-AUTH_TOKEN_ALGORITHM=AUTH_TOKEN_ALGORITHM
 JWKS=JWKS
 ```
 
 ---
 
-## Example Code
+## Usage
 
 ### Headers Validation Model
 
-The current headers validation model supports both inter-service calls and client-to-backend communication.
-First it check cookie validation and then fallback to headers for authorization.
+The headers validation model supports both inter-service calls and client-to-backend communication. It first checks cookie validation and then falls back to header-based authorization.
 
 ```python
 import uuid
@@ -77,9 +75,9 @@ class Headers_PM(BaseModel):
         return super().model_dump(**kwargs, exclude=exclude_fields)
 ```
 
-### Setting up REST Middlewares
+### Setting Up REST Middlewares
 
-Below is an example of setting up REST middlewares in a FastAPI app:
+Here is an example of setting up REST middlewares in a FastAPI app:
 
 ```python
 app.add_middleware(
@@ -110,7 +108,7 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
+Contributions are welcome! Follow these steps:
 
 1. Fork the repository.
 2. Create a feature branch: `git checkout -b feature-name`.
@@ -120,9 +118,9 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## PyPI Upload
+## Publishing to PyPI
 
-To upload the library to PyPI, use the following steps:
+To upload the library to PyPI, follow these steps:
 
 ```bash
 pip install -r requirements.dev.txt
