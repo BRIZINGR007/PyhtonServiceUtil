@@ -2,7 +2,9 @@ import re
 from fastapi.responses import StreamingResponse
 from abc import ABC, abstractmethod
 import json
-from typing import Optional, Dict, List, Any
+from typing import Generic, Optional, Dict, List, Any, Type, TypeVar
+
+from pydantic import BaseModel
 
 from ...clients.bedrock_client.local_interfaces_typehinter import (
     LLM_ClientPayload_TH,
@@ -17,7 +19,11 @@ from .foundation_models import FoundationModels
 from ...logging.base_logger import APP_LOGGER
 
 
-class LLMOperation(ABC):
+T = TypeVar("T", bound=BaseModel)
+
+
+class LLMOperation(ABC, Generic[T]):
+    pydantic_model_class: Type[T]
 
     def get_json_response(self, string: str):
         json_match = re.search(r"{.*}", string, re.DOTALL)
@@ -91,7 +97,8 @@ class LLMOperation(ABC):
         raise ValueError(f"Failed to extract JSON after {max_retries} attempts.")
 
     @abstractmethod
-    def execute_llm_operation(self) -> Any:
+    def execute_llm_operation(self, payload: T, modelId: FoundationModels) -> Any:
+        self.pydantic_model_class(**payload)
         raise NotImplementedError("Subclasses must implement execute_llm_operation.")
 
 
