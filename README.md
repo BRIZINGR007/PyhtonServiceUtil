@@ -9,9 +9,8 @@ PythonServiceUtil is a utility library designed for Python-based microservices. 
 - **Redis Support**: Efficient caching and data store capabilities.
 - **MongoDB Integration**: Simplify database operations with MongoDB.
 
-## Installation
 
-To install the library, use the following commands:
+## PyPi Upload :
 
 ```bash
 pip install -r  requirements.dev.txt

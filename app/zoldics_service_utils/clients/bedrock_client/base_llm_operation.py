@@ -2,7 +2,7 @@ import re
 from fastapi.responses import StreamingResponse
 from abc import ABC, abstractmethod
 import json
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 
 from .bedrock_client import GenerateBedrockResponse
 from ...interfaces.interfaces_th import (
@@ -86,6 +86,10 @@ class LLMOperation(ABC):
                 return json_response
             APP_LOGGER.warning(f"Attempt {attempt + 1}: Failed to extract JSON.")
         raise ValueError(f"Failed to extract JSON after {max_retries} attempts.")
+
+    @abstractmethod
+    def execute_llm_operation(self) -> Any:
+        raise NotImplementedError("Subclasses must implement execute_llm_operation.")
 
 
 class BaseAIEventsConfig(ABC):
