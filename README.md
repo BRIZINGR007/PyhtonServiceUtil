@@ -1,7 +1,21 @@
-# PyhtonServiceUtil
-A service Util for Python Based Micro Services  with support for REST Interservice calls , AWS SQS , Redis and MongoDB.
- 1007  pip install -r  requirements.dev.txt
- 1008  ls
- 1009  python setup.py bdist_wheel sdist
- 1010  twine check dist/*
- 1011  twine upload dist/*
+# PythonServiceUtil
+
+PythonServiceUtil is a utility library designed for Python-based microservices. It provides seamless support for REST inter-service calls, AWS SQS, Redis, and MongoDB, enabling faster and more efficient microservice development.
+
+## Features
+
+- **REST Inter-service Calls**: Simplify HTTP requests between services.
+- **AWS SQS Integration**: Streamline message queue operations.
+- **Redis Support**: Efficient caching and data store capabilities.
+- **MongoDB Integration**: Simplify database operations with MongoDB.
+
+## Installation
+
+To install the library, use the following commands:
+
+```bash
+pip install -r  requirements.dev.txt
+python setup.py bdist_wheel sdist
+twine check dist/*
+twine upload dist/*
+```

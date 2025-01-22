@@ -6,3 +6,4 @@ from ...interfaces.interfaces_th import (
 )
 
 from .base_llm_operation import LLMOperation, BaseAIEventsConfig
+from .foundation_models import FoundationModels
