@@ -1,43 +1,66 @@
 # PythonServiceUtil
 
-PythonServiceUtil is a utility library designed for Python-based microservices. It provides seamless support for REST inter-service calls, AWS SQS, Redis, and MongoDB, enabling faster and more efficient microservice development.
+PythonServiceUtil is a utility library designed to streamline Python-based microservice development. It offers robust support for REST inter-service calls, AWS SQS, Redis, and MongoDB, enabling faster, more efficient development workflows.
 
 ## Features
 
-- **REST Inter-service Calls**: Simplify HTTP requests between services.
-- **AWS SQS Integration**: Streamline message queue operations.
-- **Redis Support**: Efficient caching and data store capabilities.
-- **MongoDB Integration**: Simplify database operations with MongoDB.
+- **REST Inter-service Calls**: Simplifies HTTP communication between services.
+- **AWS SQS Integration**: Enhances message queue operations.
+- **Redis Support**: Provides efficient caching and data storage.
+- **MongoDB Integration**: Simplifies interactions with MongoDB databases.
 
 ---
 
-The validation step works in the following way:
-First it checks and validates the access token.
-Then it falls back to XAPI-KEY validation validation .
+## Validation Workflow
+
+The validation process works as follows:
+
+1. **Access Token Validation**: The primary step validates the access token.
+2. **Fallback to X-API-KEY Validation**: If the access token validation fails, X-API-KEY validation is used.
+
+**Note**: The JWKS should be in the format `List[Jwk_TH]`. Mention the symmetric or asymmetric algorithm you want to use :AUTH_TOKEN_ALGORITHM
+
+```python
+class Jwk_TH(TypedDict, total=False):
+    alg: Required[str]
+    e: str
+    kid: Required[str]
+    kty: str
+    n: str
+    use: str
+
+def __load_jwks() -> List[Jwk_TH]:
+    return json.loads(str(config("JWKS")))
+```
+
+---
 
 ## Configuration
 
-To configure the library, use an `.env` file with the following keys:
+Use an `.env` file to configure the library with the following keys:
 
 ```plaintext
-
 ENVIRONMENT=develop
+LOGGING_FILENAME=service.log
+AUTH_TOKEN_ALGORITHM=RS256
 BEDROCK_AWS_REGION_NAME=region_name
 AWS_REGION_NAME=region_name
 AWS_ACCESS_KEY_ID=amazing_access_key
 AWS_SECRET_ACCESS_KEY=amazing_secret_access_key
-X_API_KEY_EMBEDDING-SERVICE_1=access_key
-X_API_KEY_EMBEDDING-SERVICE_2=access_key
-
+X_API_KEY_EMBEDDING_SERVICE_1=access_key
+X_API_KEY_EMBEDDING_SERVICE_2=access_key
+AUTH_TOKEN_ALGORITHM=AUTH_TOKEN_ALGORITHM
+JWKS=JWKS
 ```
 
 ---
 
 ## Example Code
 
-Below is teh current headers validation Model both for message context as well as for interservice call or client to backend call.
+### Headers Validation Model
 
-The rest middleware support both validation of auth token both from cookie or from headers .
+The current headers validation model supports both inter-service calls and client-to-backend communication.
+First it check cookie validation and then fallback to headers for authorization.
 
 ```python
 import uuid
@@ -53,27 +76,27 @@ class Headers_PM(BaseModel):
         return super().model_dump(**kwargs, exclude=exclude_fields)
 ```
 
-sample example of setting up the REST middlewares in the services for FastAPI app :
+### Setting up REST Middlewares
+
+Below is an example of setting up REST middlewares in a FastAPI app:
 
 ```python
 app.add_middleware(
     HeaderValidationMiddleware,
-    x_api_key_1=cast(str, config("X_API_KEY_EMBEDDING-SERVICE_1")),
-    x_api_key_2=cast(str, config("X_API_KEY_EMBEDDING-SERVICE_2")),
-    authexpiryignore_paths=frozenset(
-        [
-            ServicePaths.CONTEXT_PATH.value + "/encoders",
-            ServicePaths.CONTEXT_PATH.value + "/llm",
-        ]
-    ),
+    x_api_key_1=cast(str, config("X_API_KEY_EMBEDDING_SERVICE_1")),
+    x_api_key_2=cast(str, config("X_API_KEY_EMBEDDING_SERVICE_2")),
+    authexpiryignore_paths=frozenset([
+        ServicePaths.CONTEXT_PATH.value + "/encoders",
+        ServicePaths.CONTEXT_PATH.value + "/llm",
+    ]),
 )
 app.add_middleware(ExceptionMiddleware)
 ```
 
-### Explanation
+### Key Fields in `Headers_PM`
 
 - **`correlationid`**: A unique identifier for tracing requests, generated using `uuid4()`.
-- **`username`**: The username associated with the request; defaults to "not_applicable".
+- **`username`**: The username associated with the request; defaults to `"not_applicable"`.
 - **`authorization`**: The authorization token, defaulting to an empty string.
 
 ---
@@ -86,20 +109,22 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Contributing
 
-Contributions are welcome! Please follow the steps below:
+Contributions are welcome! Please follow these steps:
 
 1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature-name`).
-3. Commit your changes (`git commit -m 'Add feature'`).
-4. Push to the branch (`git push origin feature-name`).
+2. Create a feature branch: `git checkout -b feature-name`.
+3. Commit your changes: `git commit -m 'Add feature'`.
+4. Push to the branch: `git push origin feature-name`.
 5. Open a pull request.
 
 ---
 
-## PyPi Upload :
+## PyPI Upload
+
+To upload the library to PyPI, use the following steps:
 
 ```bash
-pip install -r  requirements.dev.txt
+pip install -r requirements.dev.txt
 python setup.py bdist_wheel sdist
 twine check dist/*
 twine upload dist/*

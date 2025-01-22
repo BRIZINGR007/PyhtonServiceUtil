@@ -27,7 +27,7 @@ class JwtValdationUtils:
     @lru_cache(maxsize=1)
     @staticmethod
     def __load_jwks() -> List[Jwk_TH]:
-        return json.loads(str(config("JWKS")))["keys"]
+        return json.loads(str(config("JWKS")))
 
     @classmethod
     def _get_public_key(cls, kid: str) -> Optional[str]:
