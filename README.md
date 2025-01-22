@@ -11,22 +11,23 @@ PythonServiceUtil is a utility library designed for Python-based microservices. 
 
 ---
 
-
-The  validation step works  in the  following way:
-First  it checks  and validates the access  token.
+The validation step works in the following way:
+First it checks and validates the access token.
 Then it falls back to XAPI-KEY validation validation .
-
 
 ## Configuration
 
 To configure the library, use an `.env` file with the following keys:
 
 ```plaintext
+
 ENVIRONMENT=develop
 BEDROCK_AWS_REGION_NAME=region_name
 AWS_REGION_NAME=region_name
 AWS_ACCESS_KEY_ID=amazing_access_key
 AWS_SECRET_ACCESS_KEY=amazing_secret_access_key
+X_API_KEY_EMBEDDING-SERVICE_1=access_key
+X_API_KEY_EMBEDDING-SERVICE_2=access_key
 
 ```
 
@@ -34,9 +35,9 @@ AWS_SECRET_ACCESS_KEY=amazing_secret_access_key
 
 ## Example Code
 
-Below is teh current headers  validation Model both for message context as well as for  interservice call or  client  to backend call.
+Below is teh current headers validation Model both for message context as well as for interservice call or client to backend call.
 
-The rest  middleware support both validation of  auth  token both from cookie or from headers . 
+The rest middleware support both validation of auth token both from cookie or from headers .
 
 ```python
 import uuid
@@ -52,7 +53,7 @@ class Headers_PM(BaseModel):
         return super().model_dump(**kwargs, exclude=exclude_fields)
 ```
 
-sample example  of  setting up  the middlewares  in the services for FastAPI app :
+sample example of setting up the REST middlewares in the services for FastAPI app :
 
 ```python
 app.add_middleware(
@@ -69,13 +70,11 @@ app.add_middleware(
 app.add_middleware(ExceptionMiddleware)
 ```
 
-
 ### Explanation
 
 - **`correlationid`**: A unique identifier for tracing requests, generated using `uuid4()`.
 - **`username`**: The username associated with the request; defaults to "not_applicable".
 - **`authorization`**: The authorization token, defaulting to an empty string.
-- **`model_dump`**: A method for exporting the model as a dictionary, with optional field exclusion.
 
 ---
 
