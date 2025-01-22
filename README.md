@@ -11,6 +11,12 @@ PythonServiceUtil is a utility library designed for Python-based microservices. 
 
 ---
 
+
+The  validation step works  in the  following way:
+First  it checks  and validates the access  token.
+Then it falls back to XAPI-KEY validation validation .
+
+
 ## Configuration
 
 To configure the library, use an `.env` file with the following keys:
@@ -21,6 +27,7 @@ BEDROCK_AWS_REGION_NAME=region_name
 AWS_REGION_NAME=region_name
 AWS_ACCESS_KEY_ID=amazing_access_key
 AWS_SECRET_ACCESS_KEY=amazing_secret_access_key
+
 ```
 
 ---
@@ -44,6 +51,24 @@ class Headers_PM(BaseModel):
     def model_dump(self, exclude_fields={}, **kwargs) -> Dict[str, Any]:
         return super().model_dump(**kwargs, exclude=exclude_fields)
 ```
+
+sample example  of  setting up  the middlewares  in the services for FastAPI app :
+
+```python
+app.add_middleware(
+    HeaderValidationMiddleware,
+    x_api_key_1=cast(str, config("X_API_KEY_EMBEDDING-SERVICE_1")),
+    x_api_key_2=cast(str, config("X_API_KEY_EMBEDDING-SERVICE_2")),
+    authexpiryignore_paths=frozenset(
+        [
+            ServicePaths.CONTEXT_PATH.value + "/encoders",
+            ServicePaths.CONTEXT_PATH.value + "/llm",
+        ]
+    ),
+)
+app.add_middleware(ExceptionMiddleware)
+```
+
 
 ### Explanation
 
