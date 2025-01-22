@@ -4,10 +4,13 @@ from abc import ABC, abstractmethod
 import json
 from typing import Optional, Dict, List, Any
 
+from ...clients.bedrock_client.local_interfaces_typehinter import (
+    LLM_ClientPayload_TH,
+)
+
 from .bedrock_client import GenerateBedrockResponse
 from ...interfaces.interfaces_th import (
     LLM_HyperParameters_TH,
-    LLM_ClientPayload_TH,
     LLM_PromptTemplates_TH,
 )
 from .foundation_models import FoundationModels

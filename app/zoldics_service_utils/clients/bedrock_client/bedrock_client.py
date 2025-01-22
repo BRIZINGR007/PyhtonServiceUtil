@@ -2,11 +2,14 @@ import json
 from typing import Dict, List, Optional, Union
 from fastapi.responses import StreamingResponse
 
+from app.zoldics_service_utils.clients.bedrock_client.local_interfaces_typehinter import (
+    LLM_ClientPayload_TH,
+)
+
 from ..bedrock_client.call_bedrock import BedrockClient_Sync
 from ..bedrock_client.fm_config import FMS_BEDROCK
 from ...interfaces.interfaces_th import (
     LLM_HyperParameters_TH,
-    LLM_ClientPayload_TH,
     LLM_SpecialTokens_TH,
 )
 from ...logging.base_logger import APP_LOGGER

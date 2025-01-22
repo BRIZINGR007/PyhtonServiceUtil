@@ -2,10 +2,6 @@ from typing import TypedDict, Required, Dict
 
 from typing import TypedDict, List, Dict, Required
 
-from ..clients.bedrock_client.foundation_models import (
-    FoundationModels,
-)
-
 
 class Jwk_TH(TypedDict, total=False):
     alg: Required[str]
@@ -39,12 +35,6 @@ class LLM_HyperParameters_TH(TypedDict, total=False):
     top_k: int
     max_tokens: int
     stop: List[str]
-
-
-class LLM_ClientPayload_TH(TypedDict):
-    messages: List[Dict[str, str]]
-    model_hyperparameters: LLM_HyperParameters_TH
-    modelId: FoundationModels
 
 
 class BedrockPayload_TH(TypedDict, total=False):
