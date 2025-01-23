@@ -66,4 +66,4 @@ class LLM_PromptTemplates_TH(TypedDict, total=False):
     system_prompt: str
     user_prompt: Required[str]
     user_prompt_1: str
-    base_token_count: Required[int]
+    base_token_count: int
