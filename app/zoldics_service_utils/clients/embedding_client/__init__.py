@@ -1,0 +1,1 @@
+from .bedrock_embedding_generator import EmbeddingGenerator
