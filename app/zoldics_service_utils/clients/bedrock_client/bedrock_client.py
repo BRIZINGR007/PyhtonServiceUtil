@@ -2,7 +2,7 @@ import json
 from typing import Dict, List, Optional, Union
 from fastapi.responses import StreamingResponse
 
-from app.zoldics_service_utils.clients.bedrock_client.local_interfaces_typehinter import (
+from ..bedrock_client.local_interfaces_typehinter import (
     LLM_ClientPayload_TH,
 )
 
