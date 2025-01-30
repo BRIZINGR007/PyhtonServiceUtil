@@ -27,9 +27,7 @@ class SyncSQSPusher:
     def __construct_message_body(
         self, action: str, payload: Dict[str, Any]
     ) -> Message_Payload_TypeHinter:
-        message_context = ContextUtils.get_user_details_from_headers().model_dump(
-            mode="json"
-        )
+        message_context = ContextUtils.get_header_details().model_dump(mode="json")
         message_payload = Message_Payload_TypeHinter(
             action=action, context=message_context, payload=payload
         )

@@ -7,5 +7,5 @@ from ..context.vars import headers_context
 
 class ContextUtils:
     @staticmethod
-    def get_user_details_from_headers() -> Headers_PM:
+    def get_header_details() -> Headers_PM:
         return cast(Headers_PM, headers_context.get())

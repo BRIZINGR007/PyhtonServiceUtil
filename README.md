@@ -53,6 +53,30 @@ X_API_KEY_EMBEDDING_SERVICE_2=access_key
 JWKS=JWKS
 ```
 
+Bedrock Client .env  config :
+```plaintext
+AWS_BEDROCK_REGION_NAME="us-east-1"
+AWS_BEDROCK_ACCESS_KEY="abcdefgh"
+AWS_BEDROCK_SECRET_ACCESS_KEY="xyzxyzxyz"
+```
+
+SQS Client .env  config :
+
+```plaintext
+AWS_SQS_REGION_NAME="us-east-1"
+AWS_SQS_ACCESS_KEY="xyzefgdh"
+AWS_SQS_SECRET_ACCESS_KEY="abcdefgh"
+```
+
+EmbeddingClient .env config : 
+Note  : Currently It only supports  Bedrock  Encoders "amazon.titan-embed-text-v2:0"
+
+```plaintext
+AWS_BEDROCK_REGION_NAME="us-east-1"
+AWS_BEDROCK_ACCESS_KEY="abcdefgh"
+AWS_BEDROCK_SECRET_ACCESS_KEY="xyzxyzxyz"
+```
+
 ---
 
 ## Usage
