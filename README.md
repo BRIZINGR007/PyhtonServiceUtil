@@ -46,35 +46,11 @@ LOGGING_FILENAME=service.log
 AUTH_TOKEN_ALGORITHM=RS256
 BEDROCK_AWS_REGION_NAME=region_name
 AWS_REGION_NAME=region_name
-AWS_ACCESS_KEY_ID=your_access_key
+AWS_ACCESS_KEY=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_access_key
 X_API_KEY_EMBEDDING_SERVICE_1=access_key
 X_API_KEY_EMBEDDING_SERVICE_2=access_key
 JWKS=JWKS
-```
-
-Bedrock Client .env  config :
-```plaintext
-AWS_BEDROCK_REGION_NAME="us-east-1"
-AWS_BEDROCK_ACCESS_KEY="abcdefgh"
-AWS_BEDROCK_SECRET_ACCESS_KEY="xyzxyzxyz"
-```
-
-SQS Client .env  config :
-
-```plaintext
-AWS_SQS_REGION_NAME="us-east-1"
-AWS_SQS_ACCESS_KEY="xyzefgdh"
-AWS_SQS_SECRET_ACCESS_KEY="abcdefgh"
-```
-
-EmbeddingClient .env config : 
-Note  : Currently It only supports  Bedrock  Encoders "amazon.titan-embed-text-v2:0"
-
-```plaintext
-AWS_BEDROCK_REGION_NAME="us-east-1"
-AWS_BEDROCK_ACCESS_KEY="abcdefgh"
-AWS_BEDROCK_SECRET_ACCESS_KEY="xyzxyzxyz"
 ```
 
 ---

@@ -19,9 +19,9 @@ class Message_Payload_TypeHinter(TypedDict, total=False):
 
 @final
 class SyncSQSPusher:
-    aws_access_key_id: str = cast(str, config("AWS_SQS_ACCESS_KEY"))
-    aws_secret_access_key: str = cast(str, config("AWS_SQS_SECRET_ACCESS_KEY"))
-    aws_region_name: str = cast(str, config("AWS_SQS_REGION_NAME", default=False))
+    aws_access_key_id: str = cast(str, config("AWS_ACCESS_KEY"))
+    aws_secret_access_key: str = cast(str, config("AWS_SECRET_ACCESS_KEY"))
+    aws_region_name: str = cast(str, config("AWS_REGION_NAME", default=False))
     queue_config: Dict[str, Dict[str, bool]] = QUEUE_CONFIG
 
     def __construct_message_body(

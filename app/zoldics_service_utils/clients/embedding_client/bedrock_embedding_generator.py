@@ -9,9 +9,9 @@ class EmbeddingGenerator(metaclass=SingletonMeta):
     def __init__(self) -> None:
         self.__client = boto3.client(
             "bedrock-runtime",
-            region_name=str(config("AWS_BEDROCK_REGION_NAME")),
-            aws_access_key_id=str(config("AWS_BEDROCK_ACCESS_KEY")),
-            aws_secret_access_key=str(config("AWS_BEDROCK_SECRET_ACCESS_KEY")),
+            region_name=str(config("AWS_REGION_NAME")),
+            aws_access_key_id=str(config("AWS_ACCESS_KEY")),
+            aws_secret_access_key=str(config("AWS_SECRET_ACCESS_KEY")),
         )
         self.__model_id = "amazon.titan-embed-text-v2:0"
         self.__dimensions = 256
