@@ -18,11 +18,6 @@ class Headers_TH(TypedDict):
     authorization: str
 
 
-class SSEMessage_TH(TypedDict):
-    event: str
-    data: Dict[str, str]
-
-
 class SQSClientCallBackResponse_TH(TypedDict):
     allSuccess: bool
     correlationid: str

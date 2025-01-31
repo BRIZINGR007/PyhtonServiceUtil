@@ -11,7 +11,13 @@ class Headers_PM(BaseModel):
     def model_dump(self, exclude_fields={}, **kwargs) -> Dict[str, Any]:
         return super().model_dump(**kwargs, exclude=exclude_fields)
 
+
 class RequestContext_PM(BaseModel):
     request_trace_id: str
     url_path: str
     method: str
+
+
+class SSEPaylaod_PM(BaseModel):
+    event: str
+    data: Any

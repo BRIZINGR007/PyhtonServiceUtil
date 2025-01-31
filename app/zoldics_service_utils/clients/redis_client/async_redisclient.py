@@ -3,7 +3,7 @@ from redis.asyncio import Redis
 import json
 from typing import AsyncGenerator, Optional
 
-from ...interfaces.interfaces_th import SSEMessage_TH
+from ...interfaces.interfaces_pd import SSEPaylaod_PM
 from ...ioc.singleton import SingletonMeta
 
 
@@ -13,7 +13,7 @@ class AsyncRedisClient(metaclass=SingletonMeta):
             self.redis: Redis = redis_connection
         self.pubsub = self.redis.pubsub()
 
-    async def publish(self, channel: str, message: SSEMessage_TH) -> int:
+    async def publish(self, channel: str, message: SSEPaylaod_PM) -> int:
         return await self.redis.publish(channel=channel, message=json.dumps(message))
 
     async def subscribe(self, channel: str) -> None:
