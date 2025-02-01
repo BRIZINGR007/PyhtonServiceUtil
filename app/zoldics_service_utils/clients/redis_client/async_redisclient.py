@@ -14,7 +14,9 @@ class AsyncRedisClient(metaclass=SingletonMeta):
         self.pubsub = self.redis.pubsub()
 
     async def publish(self, channel: str, message: SSEPaylaod_PM) -> int:
-        return await self.redis.publish(channel=channel, message=json.dumps(message))
+        return await self.redis.publish(
+            channel=channel, message=json.dumps(message.model_dump())
+        )
 
     async def subscribe(self, channel: str) -> None:
         await self.pubsub.subscribe(channel)
