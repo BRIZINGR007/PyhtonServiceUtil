@@ -19,7 +19,7 @@ from ..middlewares.message_middlewares import (
 T = TypeVar("T", bound=BaseModel)
 
 
-class ProcessActionHandler(ABC, Generic[T]):
+class AsyncTaskHandler(ABC, Generic[T]):
     pydantic_model_class: Type[T]
 
     def __init__(self, app: FastAPI) -> None:
