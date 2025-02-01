@@ -2,6 +2,19 @@ import requests
 from decouple import config
 from typing import Optional, Dict
 
+"""
+    A versatile HTTP client for making inter-service calls or external API requests.
+
+    Attributes:
+        headers (Dict[str, str]): Headers to be included in the HTTP request.
+        path (str): The endpoint path for the request.
+        body (Optional[Dict]): The request body for methods like POST, PATCH, PUT.
+        path_params (Optional[Dict[str, str]]): Path parameters to be substituted in the URL.
+        query_params (Optional[Dict[str, str]]): Query parameters to be appended to the URL.
+        localhost_interservice_call (bool): If True, the request is made to localhost for development purposes.
+        portNumber (Optional[str]): The port number to use when making localhost requests.
+"""
+
 
 class HttpClient:
     def __init__(
@@ -11,10 +24,10 @@ class HttpClient:
         body=None,
         path_params: Optional[Dict[str, str]] = None,
         query_params: Optional[Dict[str, str]] = None,
-        interServiceCall: bool = False,
+        localhost_interservice_call: bool = False,
         portNumber: Optional[str] = None,
     ) -> None:
-        self.interServiceCall = interServiceCall
+        self.__localhost_interservice_call = localhost_interservice_call
         self.__environment: str = str(config("ENVIRONMENT", default=""))
         self.__domain: str = str(config("DOMAIN", default=""))
         self.__portnumber: Optional[str] = portNumber
@@ -27,7 +40,7 @@ class HttpClient:
     def __construct_url(self) -> str:
         base_url = (
             f"https://{self.__environment}{self.__domain}/"
-            if self.interServiceCall
+            if not self.__localhost_interservice_call
             else f"http://localhost:{self.__portnumber}/"
         )
         url = base_url + self.__path
