@@ -14,7 +14,7 @@ evaluation-service=yourname-evaluation-service
 
 
 class QUEUE_NAMES(StrEnum):
-    APP_001_AI_SERVICE = "app-001-ai-service"
+    APP_001_AI_SERVICE = "app001-ai-service"
 
 
 QUEUE_CONFIG: Dict[str, Dict[str, bool]] = {
