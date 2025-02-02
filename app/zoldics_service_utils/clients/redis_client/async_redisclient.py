@@ -5,7 +5,7 @@ from typing import AsyncGenerator, Optional, Any, List, cast
 
 from ...logging.base_logger import APP_LOGGER
 
-from ...interfaces.interfaces_pd import SSEPaylaod_PM
+from ...interfaces.interfaces_pd import SSEPayload_PM
 from ...ioc.singleton import SingletonMeta
 
 
@@ -34,7 +34,7 @@ class AsyncRedisClient(metaclass=SingletonMeta):
     async def send_command(self, *commands: str) -> Any:
         return await self.redis.execute_command(*commands)
 
-    async def publish(self, channel: str, message: SSEPaylaod_PM) -> int:
+    async def publish(self, channel: str, message: SSEPayload_PM) -> int:
         return await self.redis.publish(
             channel=channel, message=json.dumps(message.model_dump())
         )

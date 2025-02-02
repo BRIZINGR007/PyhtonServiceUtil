@@ -1,7 +1,7 @@
 from redis import Redis
 from typing import Any, List, Optional, Generator, cast
 import json
-from ...interfaces.interfaces_pd import SSEPaylaod_PM
+from ...interfaces.interfaces_pd import SSEPayload_PM
 from ...ioc.singleton import SingletonMeta
 
 
@@ -32,7 +32,7 @@ class SyncRedisClient(metaclass=SingletonMeta):
     def send_command(self, *commands: str) -> Any:
         return self.redis.execute_command(*commands)
 
-    def publish(self, channel: str, message: SSEPaylaod_PM) -> int:
+    def publish(self, channel: str, message: SSEPayload_PM) -> int:
         return cast(
             int,
             self.redis.publish(
