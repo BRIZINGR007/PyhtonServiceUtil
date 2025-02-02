@@ -18,6 +18,6 @@ class RequestContext_PM(BaseModel):
     method: str
 
 
-class SSEPaylaod_PM(BaseModel):
+class SSEPayload_PM(BaseModel):
     event: str
     data: Any
