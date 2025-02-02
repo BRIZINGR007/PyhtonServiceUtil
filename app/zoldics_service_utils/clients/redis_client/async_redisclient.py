@@ -3,7 +3,7 @@ from redis.asyncio import Redis
 import json
 from typing import AsyncGenerator, Optional, Any, List, cast
 
-from app.zoldics_service_utils.logging.base_logger import APP_LOGGER
+from ...logging.base_logger import APP_LOGGER
 
 from ...interfaces.interfaces_pd import SSEPaylaod_PM
 from ...ioc.singleton import SingletonMeta

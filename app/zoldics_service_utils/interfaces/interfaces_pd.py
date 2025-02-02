@@ -19,5 +19,5 @@ class RequestContext_PM(BaseModel):
 
 
 class SSEPaylaod_PM(BaseModel):
-    action: str
+    event: str
     data: Any
