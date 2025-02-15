@@ -6,4 +6,4 @@ from ..middlewares.rest_middlewares import (
 
 from ..middlewares.message_middlewares import MessageMiddleware
 
-from ..middlewares.rate_limiter_middleware import RestRateLimitGuard
+from ..middlewares.rate_limiter_middleware import RateLimiterGuard
