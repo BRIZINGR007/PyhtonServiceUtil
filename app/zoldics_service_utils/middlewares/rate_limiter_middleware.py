@@ -1,88 +1,63 @@
-# import time
-# from functools import wraps
-# from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Request
+from functools import wraps
+from typing import Callable, cast
+from datetime import datetime, timezone
+from redis.exceptions import RedisError
 
-# from fastapi import APIRouter, Depends, HTTPException, Request
-# from fastapi.security import HTTPBearer
-# from pydantic import BaseSettings
-# from redis import Redis
-# from redis.exceptions import RedisError
+from app.zoldics_service_utils.clients.redis_client.enums import RedisExpiryEnums
 
-# # Configuration Management
-# class Settings(BaseSettings):
-#     redis_host: str = "localhost"
-#     redis_port: int = 6379
-#     default_rate_limit: int = 1000
+from ..clients.redis_client.sync_redisclient import (
+    SyncRedisClient,
+)
 
-#     class Config:
-#         env_file = ".env"
 
-# settings = Settings()
+class RestRateLimiter:
+    def __init__(self):
+        self.redis_client = SyncRedisClient()
 
-# # Rate Limiter Class
-# class RateLimiter:
-#     def __init__(self, redis_client: Redis, default_limit: int = settings.default_rate_limit):
-#         self.redis_client = redis_client
-#         self.default_limit = default_limit
+    def check_rate_limit(
+        self, key: str, cache_expiry: RedisExpiryEnums, max_calls: int
+    ):
+        """Checks if the request exceeds the rate limit."""
+        try:
+            match cache_expiry:
+                case RedisExpiryEnums.ONE_DAY_EXPIRY:
+                    cache_key = f"{key}:ONE_DAY_EXPIRY"
+                case RedisExpiryEnums.ONE_HOUR_EXPIRY:
+                    cache_key = f"{key}:ONE_HOUR_EXPIRY"
+                case RedisExpiryEnums.ONE_MONTH_EXPIRY:
+                    cache_key = f"{key}:ONE_MONTH_EXPIRY"
+                case _:
+                    raise ValueError("Invalid Redis Key.")
 
-#     def check_rate_limit(self, key: str, max_calls: Optional[int] = None):
-#         """Checks if the request exceeds the daily rate limit."""
-#         max_calls = max_calls or self.default_limit
-#         key_with_date = f"{key}:{time.strftime('%Y-%m-%d')}"  # Key for today's count
+            current_count = cast(int, self.redis_client.redis.incr(cache_key))
+            if current_count == 1:
+                self.redis_client.redis.expire(cache_key, cache_expiry.value)
 
-#         try:
-#             # Increment the call count
-#             current_count = self.redis_client.incr(key_with_date)
+            if current_count > max_calls:
+                raise HTTPException(
+                    status_code=429,
+                    detail=f"Rate limit exceeded. Max {max_calls} requests allowed.",
+                )
+        except RedisError:
+            raise HTTPException(
+                status_code=500, detail="Rate limiter failed due to Redis error."
+            )
 
-#             # Set expiration if it's the first call
-#             if current_count == 1:
-#                 self.redis_client.expire(key_with_date, 86400)  # 86400 seconds = 24 hours
 
-#             if current_count > max_calls:
-#                 raise HTTPException(
-#                     status_code=429,
-#                     detail=f"Rate limit exceeded. Maximum {max_calls} requests per day allowed for this endpoint."
-#                 )
-#         except RedisError as e:
-#             raise HTTPException(
-#                 status_code=500,
-#                 detail="Internal server error while processing rate limit."
-#             )
+class RestRateLimitGuard:
+    def __init__(self, key: str, cacheExpiry: RedisExpiryEnums, max_calls: int) -> None:
+        self.__ratelimiter = RestRateLimiter()
+        self.__key: str = key
+        self.__cache_expiry = cacheExpiry
+        self.__max_calls = max_calls
 
-#     async def rate_limit_middleware(self, request: Request, max_calls: Optional[int] = None):
-#         """Apply rate limiting dynamically based on request path and method."""
-#         key = f"{request.method}:{request.url.path}"
-#         self.check_rate_limit(key, max_calls)
+    def __call__(self, func: Callable):
+        @wraps(func)
+        async def wrapper(instance, request: Request, *args, **kwargs):
+            self.__ratelimiter.check_rate_limit(
+                self.__key, self.__cache_expiry, self.__max_calls
+            )
+            return await func(instance, request, *args, **kwargs)
 
-# # Dependency Injection for Rate Limiter
-# def get_redis_client():
-#     return Redis(host=settings.redis_host, port=settings.redis_port, decode_responses=True)
-
-# def get_rate_limiter(redis_client: Redis = Depends(get_redis_client)):
-#     return RateLimiter(redis_client)
-
-# # Rate Limited Decorator
-# def rate_limited(limiter: RateLimiter, max_calls: Optional[int] = None):
-#     def decorator(func):
-#         @wraps(func)
-#         async def wrapper(request: Request, *args, **kwargs):
-#             await limiter.rate_limit_middleware(request, max_calls)
-#             return await func(request, *args, **kwargs)
-#         return wrapper
-#     return decorator
-
-# # Router and Endpoints
-# router = APIRouter(
-#     prefix="/api/v1/authorization",
-#     tags=["Auth"],
-# )
-
-# @router.post("/signup")
-# @rate_limited(limiter=get_rate_limiter(), max_calls=500)
-# async def signup(request: Request, payload: SignUp_PM):
-#     return AuthController.signup(payload=payload)
-
-# @router.post("/login")
-# @rate_limited(limiter=get_rate_limiter(), max_calls=300)
-# async def login(request: Request, payload: Login_PM):
-#     return AuthController.login(payload=payload)
+        return wrapper
