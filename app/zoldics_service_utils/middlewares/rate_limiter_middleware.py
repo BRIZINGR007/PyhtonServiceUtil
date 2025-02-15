@@ -4,7 +4,7 @@ from typing import Callable, cast
 from datetime import datetime, timezone
 from redis.exceptions import RedisError
 
-from app.zoldics_service_utils.clients.redis_client.enums import RedisExpiryEnums
+from ..clients.redis_client.enums import RedisExpiryEnums
 
 from ..clients.redis_client.sync_redisclient import (
     SyncRedisClient,
