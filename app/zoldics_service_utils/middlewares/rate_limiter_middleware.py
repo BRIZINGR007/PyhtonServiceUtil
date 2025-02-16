@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from typing import cast
+from typing import Optional, cast
 from redis.exceptions import RedisError
 
 from ..clients.redis_client.async_redisclient import (
@@ -13,7 +13,13 @@ class RateLimiterGuard:
     def __init__(self):
         self.redis_client = AsyncRedisClient()
 
-    async def implement(self, key: str, cache_expiry: RedisExpiryEnums, max_calls: int):
+    async def implement(
+        self,
+        key: str,
+        cache_expiry: RedisExpiryEnums,
+        max_calls: int,
+        raise429: bool = True,
+    ) -> Optional[bool]:
         """Checks if the request exceeds the rate limit."""
         try:
             match cache_expiry:
@@ -33,13 +39,13 @@ class RateLimiterGuard:
                 await self.redis_client.send_command(
                     "EXPIRE", cache_key, cache_expiry.value
                 )
-
-            if current_count > max_calls:
-                raise HTTPException(
-                    status_code=429,
-                    detail=f"Rate limit exceeded. Max {max_calls} requests allowed.",
-                )
+            if raise429:
+                if current_count > max_calls:
+                    raise HTTPException(
+                        status_code=429,
+                        detail=f"Rate limit exceeded. Max {max_calls} requests allowed.",
+                    )
+            else:
+                return current_count > max_calls
         except RedisError:
-            raise HTTPException(
-                status_code=500, detail="Rate limiter failed due to Redis error."
-            )
+            raise Exception("Rate limiter failed due to Redis error.")
