@@ -39,7 +39,7 @@ class HttpClient:
 
     def __construct_url(self) -> str:
         base_url = (
-            f"https://{self.__environment}{self.__domain}/"
+            f"https://{self.__domain}/"
             if not self.__localhost_interservice_call
             else f"http://localhost:{self.__portnumber}/"
         )
