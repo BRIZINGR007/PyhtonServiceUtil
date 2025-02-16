@@ -48,6 +48,4 @@ class RateLimiterGuard:
             else:
                 return current_count > max_calls
         except RedisError:
-            raise HTTPException(
-                status_code=500, detail="Rate limiter failed due to Redis error."
-            )
+            raise Exception("Rate limiter failed due to Redis error.")
