@@ -4,3 +4,4 @@
 build/
 dist/
 app/zoldics_service_utils.egg-info
+.VSCodeCounter
