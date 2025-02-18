@@ -1,5 +1,6 @@
 .venv
 .env
+.VSCodeCounter
 .python-version
 build/
 dist/
