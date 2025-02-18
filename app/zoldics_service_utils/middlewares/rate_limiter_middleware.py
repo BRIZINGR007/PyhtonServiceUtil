@@ -23,6 +23,8 @@ class RateLimiterGuard:
         """Checks if the request exceeds the rate limit."""
         try:
             match cache_expiry:
+                case RedisExpiryEnums.ONE_MIN_EXPIRY:
+                    cache_key = f"{key}:ONE_MIN_EXPIRY"
                 case RedisExpiryEnums.ONE_DAY_EXPIRY:
                     cache_key = f"{key}:ONE_DAY_EXPIRY"
                 case RedisExpiryEnums.ONE_HOUR_EXPIRY:
