@@ -2,7 +2,11 @@
 .env
 .VSCodeCounter
 .python-version
+.pytest_cache
 build/
 dist/
+__pycache__
+.vscode
 app/zoldics_service_utils.egg-info
 .VSCodeCounter
+service.log
