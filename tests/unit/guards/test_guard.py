@@ -51,3 +51,20 @@ async def test_rate_limiter_not_exceeded(mock_async_redis):
     )
     result = await rate_limiter()
     assert result is False
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "mock_async_redis",
+    [({"execute_command": 6})],
+    indirect=["mock_async_redis"],
+)
+async def test_rate_limiter_exceeded(mock_async_redis):
+    rate_limiter = RateLimiterGuard(
+        key=RateLimiterGuardKeys.TEST_KEY,
+        cache_expiry=RedisExpiryEnums.ONE_MIN_EXPIRY,
+        max_calls=5,
+        raise429=False,
+    )
+    result = await rate_limiter()
+    assert result is True
