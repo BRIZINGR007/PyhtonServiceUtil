@@ -1,6 +1,5 @@
 import asyncio
 import pytest
-import time
 from typing import cast
 from decouple import config
 import pytest_asyncio
