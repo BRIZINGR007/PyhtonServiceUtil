@@ -4,15 +4,16 @@ import json
 from fastapi import HTTPException
 from jwcrypto import jwk
 import jwt
-from decouple import config
 from typing import Dict, List, Optional
+
+from app.zoldics_service_utils.utils.env_initlializer import EnvStore
 
 from ..interfaces.interfaces_th import Jwk_TH
 from ..logging.base_logger import APP_LOGGER
 
 
 class JwtValdationUtils:
-    JWT_ALGORITHM = "RS256" if config("AUTH_TOKEN_ALGORITHM") == "RS256" else "HS256"
+    JWT_ALGORITHM = "RS256" if EnvStore().auth_token_algorithm == "RS256" else "HS256"
 
     @staticmethod
     def is_token_expired(token: str) -> bool:
@@ -27,7 +28,7 @@ class JwtValdationUtils:
     @lru_cache(maxsize=1)
     @staticmethod
     def __load_jwks() -> List[Jwk_TH]:
-        return json.loads(str(config("JWKS")))
+        return json.loads(EnvStore().jwks)
 
     @classmethod
     def _get_public_key(cls, kid: str) -> Optional[str]:

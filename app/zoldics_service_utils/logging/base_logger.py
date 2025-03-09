@@ -2,7 +2,8 @@ import json
 import datetime
 import logging
 import pytz
-from decouple import config
+
+from app.zoldics_service_utils.utils.env_initlializer import EnvStore
 
 # modules
 from ..context.vars import (
@@ -63,8 +64,8 @@ class RecordFormatter:
                 record_items["created"], tz=pytz.timezone("Asia/Kolkata")
             ).strftime(RecordFormatter.DATE_FORMAT_TIMEZONE),
             "message": record_items["message"],
-            "serviceName": config("SERVICENAME"),
-            "env": config("ENVIRONMENT"),
+            "serviceName": EnvStore().servicename,
+            "env": EnvStore().environment,
             "funcName": record_items["funcName"],
             "pathname": record_items["pathname"],
             "lineno": record_items["lineno"],
@@ -95,7 +96,7 @@ class LoggerFactory:
             cls._logger.handlers.clear()
 
             # File handler
-            file_handler = logging.FileHandler(str(config("LOGGING_FILENAME")))
+            file_handler = logging.FileHandler("service.log")
             file_handler.setFormatter(CustomJsonFormatter())
             cls._logger.addHandler(file_handler)
             console_handler = logging.StreamHandler()

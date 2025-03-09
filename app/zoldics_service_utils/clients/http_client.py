@@ -1,6 +1,6 @@
 import requests
-from decouple import config
 from typing import Optional, Dict
+from ..utils.env_initlializer import EnvStore
 
 """
     A versatile HTTP client for making inter-service calls or external API requests.
@@ -28,8 +28,7 @@ class HttpClient:
         portNumber: Optional[str] = None,
     ) -> None:
         self.__localhost_interservice_call = localhost_interservice_call
-        self.__environment: str = str(config("ENVIRONMENT", default=""))
-        self.__domain: str = str(config("DOMAIN", default=""))
+        self.__domain: str = EnvStore().domain
         self.__portnumber: Optional[str] = portNumber
         self.__headers = headers
         self.__path = path

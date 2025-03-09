@@ -24,7 +24,6 @@ class AsyncTaskHandler(ABC, Generic[T]):
 
     def __init__(self, app: FastAPI) -> None:
         self.app = app
-
     @classmethod
     @abstractmethod
     def execute_business_logic(cls, payload: T) -> None:

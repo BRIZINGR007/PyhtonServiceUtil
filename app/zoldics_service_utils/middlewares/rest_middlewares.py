@@ -4,11 +4,11 @@ import uuid
 import json
 import sys
 import traceback
-from decouple import config
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
-from decouple import config
 from starlette.types import ASGIApp, Scope, Receive, Send
+
+from app.zoldics_service_utils.utils.env_initlializer import EnvStore
 
 # modules
 
@@ -150,7 +150,7 @@ class ExceptionMiddleware:
                 (
                     trace
                     for trace in reversed(traceback_info)
-                    if str(config("SERVICENAME")) in trace.filename
+                    if EnvStore().servicename in trace.filename
                 ),
                 None,
             )
