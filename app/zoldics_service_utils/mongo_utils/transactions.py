@@ -1,10 +1,11 @@
-from decouple import config
 from mongoengine import get_connection
 from pymongo import MongoClient
 from pymongo.client_session import ClientSession
 import contextvars
-from typing import Optional, Any, Type, TypeVar, cast
+from typing import Optional, Any, Type, cast
 from contextlib import suppress
+
+from app.zoldics_service_utils.utils.env_initlializer import EnvStore
 
 # Global context variable for MongoDB session
 mongo_session_context: contextvars.ContextVar[Optional[ClientSession]] = (
@@ -21,7 +22,7 @@ class MongoTransactionContext:
         Args:
             db_alias: Optional database alias. If not provided, fetches from config.
         """
-        self.db_alias = db_alias or cast(str, config("DB_NAME"))
+        self.db_alias = db_alias or cast(str, EnvStore().dbname)
         self.session: Optional[ClientSession] = None
         self.token: Optional[contextvars.Token[Optional[ClientSession]]] = None
 

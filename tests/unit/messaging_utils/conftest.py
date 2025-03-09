@@ -10,6 +10,7 @@ def app():
     app.state.thread_pool = ThreadPoolExecutor()
     return app
 
+
 @pytest.fixture
 def sample_payload():
-    
+    pass

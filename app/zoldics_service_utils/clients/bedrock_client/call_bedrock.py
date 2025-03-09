@@ -1,7 +1,8 @@
 import boto3
 import json
 from typing import Dict, Union
-from decouple import config
+
+from ...utils.env_initlializer import EnvStore
 
 
 class BedrockClient_Sync:
@@ -9,9 +10,9 @@ class BedrockClient_Sync:
     def __init__(self) -> None:
         self.client = boto3.client(
             "bedrock-runtime",
-            region_name=str(config("AWS_REGION_NAME")),
-            aws_access_key_id=str(config("AWS_ACCESS_KEY")),
-            aws_secret_access_key=str(config("AWS_SECRET_ACCESS_KEY")),
+            region_name=EnvStore().aws_region_name,
+            aws_access_key_id=EnvStore().aws_access_key_id,
+            aws_secret_access_key=EnvStore().aws_secret_access_key,
         )
 
     def no_stream_bedrock_response(

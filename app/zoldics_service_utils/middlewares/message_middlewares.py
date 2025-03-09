@@ -2,7 +2,8 @@ import sys
 import traceback
 from typing import Any, Dict, Type, cast
 from pydantic import BaseModel
-from decouple import config
+
+from app.zoldics_service_utils.utils.env_initlializer import EnvStore
 
 from ..context.vars import headers_context, payload_context
 from ..interfaces.interfaces_pd import Headers_PM
@@ -42,7 +43,7 @@ class ExceptionLogger:
                 (
                     trace
                     for trace in reversed(traceback_info)
-                    if str(config("SERVICENAME")) in trace.filename
+                    if EnvStore().servicename in trace.filename
                 ),
                 None,
             )

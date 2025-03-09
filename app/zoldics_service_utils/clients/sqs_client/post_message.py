@@ -1,8 +1,9 @@
 import boto3
 import json
 from typing import final, Dict
-from decouple import config
-from typing import TypedDict, Required, Any, cast
+from typing import TypedDict, Required, Any
+
+from ...utils.env_initlializer import EnvStore
 
 from ...utils.context_utils import ContextUtils
 
@@ -19,9 +20,6 @@ class Message_Payload_TypeHinter(TypedDict, total=False):
 
 @final
 class SyncSQSPusher:
-    aws_access_key_id: str = cast(str, config("AWS_ACCESS_KEY"))
-    aws_secret_access_key: str = cast(str, config("AWS_SECRET_ACCESS_KEY"))
-    aws_region_name: str = cast(str, config("AWS_REGION_NAME", default=False))
     queue_config: Dict[str, Dict[str, bool]] = QUEUE_CONFIG
 
     def __construct_message_body(
@@ -36,19 +34,19 @@ class SyncSQSPusher:
     def __init__(self, queue_name: str, action: str, payload: Dict[str, Any]) -> None:
         self.sqs_client = boto3.client(
             "sqs",
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key,
-            region_name=self.aws_region_name,
+            aws_access_key_id=EnvStore().aws_access_key_id,
+            aws_secret_access_key=EnvStore().aws_secret_access_key,
+            region_name=EnvStore().aws_region_name,
         )
         self.aws_account_id = boto3.client(
             "sts",
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key,
+            aws_access_key_id=EnvStore().aws_access_key_id,
+            aws_secret_access_key=EnvStore().aws_secret_access_key,
         ).get_caller_identity()["Account"]
         self.queue_name = queue_name
         self.queue_url = Helpers.construct_queue_url(
             queue_name=queue_name,
-            region_name=self.aws_region_name,
+            region_name=EnvStore().aws_region_name,
             params=self.queue_config[queue_name],
             aws_account_id=self.aws_account_id,
         )
