@@ -13,6 +13,78 @@ class EnvStore(metaclass=SingletonMeta):
         self._dbname: Optional[str] = None
         self._jwks: Optional[str] = None
         self._auth_token_algorithm: Optional[str] = None
+        self._redis_uri: Optional[str] = None
+        self._mongo_uri: Optional[str] = None
+        self._service_port: Optional[str] = None
+        self._uvicorn_workers: Optional[str] = None
+        self._cognito_user_poolid: Optional[str] = None
+        self._cognito_clientid: Optional[str] = None
+        self._cognito_client_secret: Optional[str] = None
+        self._google_config: Optional[str] = None
+
+    @property
+    def google_config(self) -> str:
+        return cast(str, self._google_config)
+
+    @google_config.setter
+    def google_config(self, value: Optional[str]) -> None:
+        self._google_config = value
+
+    @property
+    def cognito_user_poolid(self) -> str:
+        return cast(str, self._cognito_user_poolid)
+
+    @cognito_user_poolid.setter
+    def cognito_user_poolid(self, value: Optional[str]) -> None:
+        self._cognito_user_poolid = value
+
+    @property
+    def cognito_clientid(self) -> str:
+        return cast(str, self._cognito_clientid)
+
+    @cognito_clientid.setter
+    def cognito_clientid(self, value: Optional[str]) -> None:
+        self._cognito_clientid = value
+
+    @property
+    def cognito_client_secret(self) -> str:
+        return cast(str, self._cognito_client_secret)
+
+    @cognito_client_secret.setter
+    def cognito_client_secret(self, value: Optional[str]) -> None:
+        self._cognito_client_secret = value
+
+    @property
+    def uvicorn_workers(self) -> str:
+        return cast(str, self._uvicorn_workers)
+
+    @uvicorn_workers.setter
+    def uvicorn_workers(self, value: str) -> None:
+        self._uvicorn_workers = value
+
+    @property
+    def service_port(self) -> str:
+        return cast(str, self._service_port)
+
+    @service_port.setter
+    def service_port(self, value: str) -> None:
+        self._service_port = value
+
+    @property
+    def mongo_uri(self) -> str:
+        return cast(str, self._mongo_uri)
+
+    @mongo_uri.setter
+    def mongo_uri(self, value: str) -> None:
+        self._mongo_uri = value
+
+    @property
+    def redis_uri(self) -> str:
+        return cast(str, self._redis_uri)
+
+    @redis_uri.setter
+    def redis_uri(self, value: str) -> None:
+        self._redis_uri = value
 
     @property
     def jwks(self) -> str:
