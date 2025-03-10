@@ -4,6 +4,7 @@ from ..ioc.singleton import SingletonMeta
 
 class EnvStore(metaclass=SingletonMeta):
     def __init__(self) -> None:
+        # Service  Utils  required envs
         self._aws_region_name: Optional[str] = None
         self._aws_access_key_id: Optional[str] = None
         self._aws_secret_access_key: Optional[str] = None
@@ -13,6 +14,7 @@ class EnvStore(metaclass=SingletonMeta):
         self._dbname: Optional[str] = None
         self._jwks: Optional[str] = None
         self._auth_token_algorithm: Optional[str] = None
+        # Service  Utils  required envs
         self._redis_uri: Optional[str] = None
         self._mongo_uri: Optional[str] = None
         self._service_port: Optional[str] = None
@@ -21,6 +23,30 @@ class EnvStore(metaclass=SingletonMeta):
         self._cognito_clientid: Optional[str] = None
         self._cognito_client_secret: Optional[str] = None
         self._google_config: Optional[str] = None
+
+    def validate_env_variables(self) -> None:
+        missing_vars = []
+
+        required_vars = {
+            "AWS_REGION_NAME": self._aws_region_name,
+            "AWS_ACCESS_KEY_ID": self._aws_access_key_id,
+            "AWS_SECRET_ACCESS_KEY": self._aws_secret_access_key,
+            "DOMAIN": self._domain,
+            "SERVICE_NAME": self._servicename,
+            "ENVIRONMENT": self._environment,
+            "DB_NAME": self._dbname,
+            "JWKS": self._jwks,
+            "AUTH_TOKEN_ALGORITHM": self._auth_token_algorithm,
+        }
+
+        for var_name, value in required_vars.items():
+            if not value:
+                missing_vars.append(var_name)
+
+        if missing_vars:
+            raise ValueError(
+                f"Missing environment variables: {', '.join(missing_vars)}"
+            )
 
     @property
     def google_config(self) -> str:
