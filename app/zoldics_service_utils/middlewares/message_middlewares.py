@@ -3,7 +3,7 @@ import traceback
 from typing import Any, Dict, Type, cast
 from pydantic import BaseModel
 
-from app.zoldics_service_utils.utils.env_initlializer import EnvStore
+from ..utils.env_initlializer import EnvStore
 
 from ..context.vars import headers_context, payload_context
 from ..interfaces.interfaces_pd import Headers_PM

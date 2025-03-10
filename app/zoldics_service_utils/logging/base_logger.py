@@ -3,7 +3,7 @@ import datetime
 import logging
 import pytz
 
-from app.zoldics_service_utils.utils.env_initlializer import EnvStore
+from ..utils.env_initlializer import EnvStore
 
 # modules
 from ..context.vars import (
