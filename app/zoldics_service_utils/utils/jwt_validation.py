@@ -1,29 +1,17 @@
 from ast import List
 from functools import lru_cache
 import json
-from fastapi import HTTPException
 from jwcrypto import jwk
 import jwt
 from typing import Dict, List, Optional
 
-from app.zoldics_service_utils.utils.env_initlializer import EnvStore
-
+from ..utils.env_initlializer import EnvStore
+from ..utils.exceptions import JwtValidationError
 from ..interfaces.interfaces_th import Jwk_TH
-from ..logging.base_logger import APP_LOGGER
 
 
 class JwtValdationUtils:
     JWT_ALGORITHM = "RS256" if EnvStore().auth_token_algorithm == "RS256" else "HS256"
-
-    @staticmethod
-    def is_token_expired(token: str) -> bool:
-        try:
-            JwtValdationUtils.validate_token(token, verify_exp=True)
-            return False
-        except HTTPException as e:
-            if e.status_code == 401 and e.detail == "Token has expired":
-                return True
-            raise e
 
     @lru_cache(maxsize=1)
     @staticmethod
@@ -45,6 +33,9 @@ class JwtValdationUtils:
         verify_aud: bool = False,
     ) -> Dict:
         try:
+            JWT_ALGORITHM = (
+                "RS256" if EnvStore().auth_token_algorithm == "RS256" else "HS256"
+            )
             default_options = dict()
             if not verify_exp:
                 default_options.update(verify_exp=False)
@@ -60,11 +51,28 @@ class JwtValdationUtils:
             return jwt.decode(
                 token,
                 public_key,
-                algorithms=[cls.JWT_ALGORITHM],
+                algorithms=[JWT_ALGORITHM],
                 options=default_options,
             )
         except jwt.ExpiredSignatureError:
-            raise HTTPException(status_code=401, detail="Token has expired")
-        except (jwt.PyJWTError, ValueError) as e:
-            APP_LOGGER.error(f"Token validation failed: {str(e)}")
-            raise HTTPException(status_code=401, detail="Invalid token")
+            raise JwtValidationError("Token has expired", cls)
+        except jwt.InvalidSignatureError:
+            raise JwtValidationError(
+                "Invalid token: Signature verification failed", cls
+            )
+        except jwt.InvalidAudienceError:
+            raise JwtValidationError(
+                "Invalid token: Audience claim verification failed", cls
+            )
+        except jwt.InvalidIssuerError:
+            raise JwtValidationError(
+                "Invalid token: Issuer claim verification failed", cls
+            )
+        except jwt.DecodeError:
+            raise JwtValidationError("Malformed token: Unable to decode", cls)
+        except jwt.PyJWTError as e:
+            raise JwtValidationError(f"Invalid token: {str(e)}", cls)
+        except Exception as e:
+            raise JwtValidationError(
+                "Internal server error during token validation", cls
+            )

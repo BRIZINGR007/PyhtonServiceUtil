@@ -19,18 +19,15 @@ class MessageMiddleware:
         headers: Headers_TH,
         payload_pydantic_model: Type[BaseModel],
     ):
-        try:
-            if headers.get("authorization"):
-                JwtValdationUtils.validate_token(
-                    token=cast(str, headers.get("authorization")),
-                    verify_aud=False,
-                    verify_exp=False,
-                )
-            pydantic_payload = payload_pydantic_model(**payload)
-            payload_context.set(pydantic_payload)
-            headers_context.set(Headers_PM(**headers))
-        except Exception as e:
-            raise ValueError(f"Validation or context setting failed: {e}")
+        if headers.get("authorization"):
+            JwtValdationUtils.validate_token(
+                token=cast(str, headers.get("authorization")),
+                verify_aud=False,
+                verify_exp=False,
+            )
+        pydantic_payload = payload_pydantic_model(**payload)
+        payload_context.set(pydantic_payload)
+        headers_context.set(Headers_PM(**headers))
 
 
 class ExceptionLogger:
