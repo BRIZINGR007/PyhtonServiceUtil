@@ -8,7 +8,7 @@ from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from starlette.types import ASGIApp, Scope, Receive, Send
 
-from app.zoldics_service_utils.utils.env_initlializer import EnvStore
+from ..utils.env_initlializer import EnvStore
 
 # modules
 
