@@ -6,7 +6,7 @@ from typing import Any, Dict, Generic, Type, TypeVar, Union
 from fastapi import FastAPI
 from pydantic import BaseModel, ValidationError
 
-from ..utils.exceptions import JwtValidationError
+from ..utils.exceptions import JwtValidationError, RateLimitReachedError
 from ..interfaces.interfaces_th import (
     Headers_TH,
     SQSClientCallBackResponse_TH,
@@ -59,7 +59,7 @@ class AsyncTaskHandler(ABC, Generic[T]):
             )
             await asyncio.wrap_future(future)
             success = True
-        except (JwtValidationError, ValidationError):
+        except (JwtValidationError, ValidationError, RateLimitReachedError):
             # In case of JwtValidationError and  Pydantic Validation Error we  delete the message from the queue .
             ExceptionLogger.log_exception(self, correlation_id=correlation_id)
             success = True
