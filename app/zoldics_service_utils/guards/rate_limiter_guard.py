@@ -2,6 +2,8 @@ from fastapi import HTTPException
 from typing import Any, Optional, cast
 from redis.exceptions import RedisError
 
+from ..utils.exceptions import RateLimitReached
+
 from .guard_key_enums import RateLimiterGuardKeys
 
 from ..clients.redis_client.async_redisclient import (
@@ -17,13 +19,13 @@ class RateLimiterGuard:
         key: RateLimiterGuardKeys,
         cache_expiry: RedisExpiryEnums,
         max_calls: int,
-        raise429: bool = True,
+        raiseHttpError: bool = True,
     ):
         self.__redis_client = AsyncRedisClient()
         self.__key = key
         self.__cache_expiry = cache_expiry
         self.__max_calls = max_calls
-        self.__raise429 = raise429
+        self.__raiseHttpError = raiseHttpError
 
     @staticmethod
     async def __implement(
@@ -31,8 +33,8 @@ class RateLimiterGuard:
         key: str,
         cache_expiry: RedisExpiryEnums,
         max_calls: int,
-        raise429: bool,
-    ) -> Optional[bool]:
+        raiseHttpError: bool,
+    ) -> None:
         """Checks if the request exceeds the rate limit."""
         try:
             match cache_expiry:
@@ -52,25 +54,24 @@ class RateLimiterGuard:
             )
             if current_count == 1:
                 await redis_client.send_command("EXPIRE", cache_key, cache_expiry.value)
-            if raise429:
-                if current_count > max_calls:
+            if current_count > max_calls:
+                if raiseHttpError:
                     raise HTTPException(
                         status_code=429,
                         detail=f"Rate limit exceeded. Max {max_calls} requests allowed.",
                     )
-            else:
-                return current_count > max_calls
+                else:
+                    raise RateLimitReached(
+                        f"Rate limit exceeded. Max {max_calls} requests allowed."
+                    )
         except RedisError:
             raise Exception("Rate limiter failed due to Redis error.")
 
-    async def __call__(self) -> bool:
-        return cast(
-            bool,
-            await self.__implement(
-                redis_client=self.__redis_client,
-                key=self.__key,
-                cache_expiry=self.__cache_expiry,
-                max_calls=self.__max_calls,
-                raise429=self.__raise429,
-            ),
+    async def __call__(self) -> None:
+        await self.__implement(
+            redis_client=self.__redis_client,
+            key=self.__key,
+            cache_expiry=self.__cache_expiry,
+            max_calls=self.__max_calls,
+            raiseHttpError=self.__raiseHttpError,
         )
