@@ -2,10 +2,11 @@ from abc import ABC, abstractmethod
 import asyncio
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import json
-from typing import Any, Dict, Generic, Type, TypeVar
+from typing import Any, Dict, Generic, Type, TypeVar, Union
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
+from ..utils.exceptions import JwtValidationError
 from ..interfaces.interfaces_th import (
     Headers_TH,
     SQSClientCallBackResponse_TH,
@@ -15,7 +16,6 @@ from ..middlewares.message_middlewares import (
     ExceptionLogger,
 )
 
-
 T = TypeVar("T", bound=BaseModel)
 
 
@@ -24,6 +24,7 @@ class AsyncTaskHandler(ABC, Generic[T]):
 
     def __init__(self, app: FastAPI) -> None:
         self.app = app
+
     @classmethod
     @abstractmethod
     def execute_business_logic(cls, payload: T) -> None:
@@ -42,48 +43,45 @@ class AsyncTaskHandler(ABC, Generic[T]):
         )
         cls.execute_business_logic(payload=cls.pydantic_model_class(**payload))
 
-    async def handle_with_process_pool(
-        self, payload: Dict[str, Any], headers: Headers_TH
+    async def _handle_with_executor(
+        self,
+        payload: Dict[str, Any],
+        headers: Headers_TH,
+        executor: Union[ProcessPoolExecutor, ThreadPoolExecutor],
     ) -> str:
-        process_pool: ProcessPoolExecutor = self.app.state.process_pool
+        """Common handler logic for both process and thread pools."""
         correlation_id = headers["correlationid"]
         try:
-            future = process_pool.submit(
+            future = executor.submit(
                 self.context_setter_and_execute_payload,
                 payload=payload,
                 headers=headers,
             )
             await asyncio.wrap_future(future)
-            response = SQSClientCallBackResponse_TH(
-                allSuccess=True, correlationid=correlation_id
-            )
-
-        except Exception:
+            success = True
+        except (JwtValidationError, ValidationError):
+            # In case of JwtValidationError and  Pydantic Validation Error we  delete the message from the queue .
             ExceptionLogger.log_exception(self, correlation_id=correlation_id)
-            response = SQSClientCallBackResponse_TH(
-                allSuccess=False, correlationid=correlation_id
-            )
+            success = True
+        except Exception:
+            # For other exceptions, we consider the task failed and do not  delte the message from  the queue . Note  : It will keep on retrying  .
+            ExceptionLogger.log_exception(self, correlation_id=correlation_id)
+            success = False
+        response = SQSClientCallBackResponse_TH(
+            allSuccess=success, correlationid=correlation_id
+        )
         return json.dumps(response)
+
+    async def handle_with_process_pool(
+        self, payload: Dict[str, Any], headers: Headers_TH
+    ) -> str:
+        """Handle the task using a process pool executor."""
+        process_pool: ProcessPoolExecutor = self.app.state.process_pool
+        return await self._handle_with_executor(payload, headers, process_pool)
 
     async def handle_with_thread_pool(
         self, payload: Dict[str, Any], headers: Headers_TH
     ) -> str:
+        """Handle the task using a thread pool executor."""
         thread_pool: ThreadPoolExecutor = self.app.state.thread_pool
-        correlation_id = headers["correlationid"]
-        try:
-            future = thread_pool.submit(
-                self.context_setter_and_execute_payload,
-                payload=payload,
-                headers=headers,
-            )
-            await asyncio.wrap_future(future)
-            response = SQSClientCallBackResponse_TH(
-                allSuccess=True, correlationid=correlation_id
-            )
-
-        except Exception:
-            ExceptionLogger.log_exception(self, correlation_id=correlation_id)
-            response = SQSClientCallBackResponse_TH(
-                allSuccess=False, correlationid=correlation_id
-            )
-        return json.dumps(response)
+        return await self._handle_with_executor(payload, headers, thread_pool)
