@@ -5,6 +5,8 @@ from jwcrypto import jwk
 import jwt
 from typing import Dict, List, Optional
 
+from ..constants.errors import ErrorEnums
+
 from ..utils.env_initlializer import EnvStore
 from ..utils.exceptions import JwtValidationError
 from ..interfaces.interfaces_th import Jwk_TH
@@ -12,6 +14,16 @@ from ..interfaces.interfaces_th import Jwk_TH
 
 class JwtValdationUtils:
     JWT_ALGORITHM = "RS256" if EnvStore().auth_token_algorithm == "RS256" else "HS256"
+
+    @staticmethod
+    def is_token_expired(token: str) -> bool:
+        try:
+            JwtValdationUtils.validate_token(token, verify_exp=True)
+            return False
+        except JwtValidationError as e:
+            if e == ErrorEnums.TOKEN_EXPIRED:
+                return True
+            raise e
 
     @lru_cache(maxsize=1)
     @staticmethod
@@ -55,24 +67,16 @@ class JwtValdationUtils:
                 options=default_options,
             )
         except jwt.ExpiredSignatureError:
-            raise JwtValidationError("Token has expired", cls)
+            raise JwtValidationError(ErrorEnums.TOKEN_EXPIRED)
         except jwt.InvalidSignatureError:
-            raise JwtValidationError(
-                "Invalid token: Signature verification failed", cls
-            )
+            raise JwtValidationError(ErrorEnums.INVALID_SIGNATURE)
         except jwt.InvalidAudienceError:
-            raise JwtValidationError(
-                "Invalid token: Audience claim verification failed", cls
-            )
+            raise JwtValidationError(ErrorEnums.INVALID_AUDIENCE)
         except jwt.InvalidIssuerError:
-            raise JwtValidationError(
-                "Invalid token: Issuer claim verification failed", cls
-            )
+            raise JwtValidationError(ErrorEnums.INVALID_ISSUER)
         except jwt.DecodeError:
-            raise JwtValidationError("Malformed token: Unable to decode", cls)
+            raise JwtValidationError(ErrorEnums.MALFORMED_TOKEN)
         except jwt.PyJWTError as e:
-            raise JwtValidationError(f"Invalid token: {str(e)}", cls)
-        except Exception as e:
-            raise JwtValidationError(
-                "Internal server error during token validation", cls
-            )
+            raise JwtValidationError(f"Invalid token: {str(e)}")
+        except Exception:
+            raise Exception(ErrorEnums.JWT_GENERAL_ERROR)
