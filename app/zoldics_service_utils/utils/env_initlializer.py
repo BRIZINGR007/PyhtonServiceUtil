@@ -23,6 +23,24 @@ class EnvStore(metaclass=SingletonMeta):
         self._cognito_clientid: Optional[str] = None
         self._cognito_client_secret: Optional[str] = None
         self._google_config: Optional[str] = None
+        self._xapi_key_1: Optional[str] = None
+        self._xapi_key_2: Optional[str] = None
+
+    @property
+    def xapi_key_1(self) -> str:
+        return cast(str, self._xapi_key_1)
+
+    @xapi_key_1.setter
+    def xapi_key_1(self, value: Optional[str]) -> None:
+        self._xapi_key_1 = value
+
+    @property
+    def xapi_key_2(self) -> str:
+        return cast(str, self._xapi_key_2)
+
+    @xapi_key_2.setter
+    def xapi_key_2(self, value: Optional[str]) -> None:
+        self._xapi_key_2 = value
 
     def validate_env_variables(self) -> None:
         missing_vars = []
