@@ -6,7 +6,10 @@ import sys
 import traceback
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 from starlette.types import ASGIApp, Scope, Receive, Send
+
+from ..utils.exceptions import JwtValidationError
 
 from ..utils.env_initlializer import EnvStore
 
@@ -98,10 +101,9 @@ class HeaderValidationMiddleware:
                 401,
             )
 
-        except HTTPException as e:
-            return False, {"detail": str(e.detail)}, e.status_code
+        except (JwtValidationError, ValidationError) as e:
+            return False, {"detail": str(e)}, 401
         except Exception as e:
-            APP_LOGGER.error(f"Unexpected error in token validation: {str(e)}")
             return False, {"detail": "Internal server error"}, 500
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
