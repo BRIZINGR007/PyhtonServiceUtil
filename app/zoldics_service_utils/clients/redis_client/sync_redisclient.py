@@ -1,7 +1,5 @@
 from redis import Redis
-from typing import Any, List, Optional, Generator, cast
-import json
-from ...interfaces.interfaces_pd import SSEPayload_PM
+from typing import Any, List, Optional, cast
 from ...ioc.singleton import SingletonMeta
 
 

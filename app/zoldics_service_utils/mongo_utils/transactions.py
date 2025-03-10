@@ -5,7 +5,7 @@ import contextvars
 from typing import Optional, Any, Type, cast
 from contextlib import suppress
 
-from app.zoldics_service_utils.utils.env_initlializer import EnvStore
+from ..utils.env_initlializer import EnvStore
 
 # Global context variable for MongoDB session
 mongo_session_context: contextvars.ContextVar[Optional[ClientSession]] = (
