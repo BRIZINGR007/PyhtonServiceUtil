@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from typing import Any, Optional, cast
 from redis.exceptions import RedisError
 
-from app.zoldics_service_utils.guards.guard_key_enums import RateLimiterGuardKeys
+from .guard_key_enums import RateLimiterGuardKeys
 
 from ..clients.redis_client.async_redisclient import (
     AsyncRedisClient,
