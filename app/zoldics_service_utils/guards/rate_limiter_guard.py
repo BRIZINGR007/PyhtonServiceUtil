@@ -1,8 +1,8 @@
 from fastapi import HTTPException
-from typing import Any, Optional, cast
+from typing import cast
 from redis.exceptions import RedisError
 
-from ..utils.exceptions import RateLimitReached
+from ..utils.exceptions import RateLimitReachedError
 
 from .guard_key_enums import RateLimiterGuardKeys
 
@@ -61,7 +61,7 @@ class RateLimiterGuard:
                         detail=f"Rate limit exceeded. Max {max_calls} requests allowed.",
                     )
                 else:
-                    raise RateLimitReached(
+                    raise RateLimitReachedError(
                         f"Rate limit exceeded. Max {max_calls} requests allowed."
                     )
         except RedisError:
