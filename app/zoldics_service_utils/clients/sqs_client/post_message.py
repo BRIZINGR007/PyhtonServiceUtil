@@ -1,6 +1,6 @@
 import boto3
 import json
-from typing import final, Dict
+from typing import Optional, final, Dict
 from typing import TypedDict, Required, Any
 
 from ...utils.env_initlializer import EnvStore
@@ -64,4 +64,47 @@ class SyncSQSPusher:
             )
         except Exception as e:
             APP_LOGGER.error("Error sending message:" + str(e))
+            raise e
+
+    def post_message_to_fifo(
+        self, message_group_id: str, message_deduplication_id: Optional[str] = None
+    ) -> None:
+        """
+        Post a message to a FIFO queue.
+
+        Args:
+            message_group_id (str): The tag that specifies that a message belongs to a specific message group.
+                                   Messages that belong to the same message group are processed in FIFO order.
+            message_deduplication_id (str, optional): The token used for deduplication of sent messages.
+                                                     If not provided, content-based deduplication will be used
+                                                     (if enabled for the queue).
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If there's an error sending the message.
+        """
+        try:
+            if not self.queue_name.endswith(".fifo"):
+                APP_LOGGER.warning(
+                    f"Queue '{self.queue_name}' does not appear to be a FIFO queue (name should end with .fifo)"
+                )
+                return
+            message_params = {
+                "QueueUrl": self.queue_url,
+                "MessageBody": json.dumps(self.message_payload),
+                "MessageGroupId": message_group_id,
+            }
+
+            if message_deduplication_id:
+                message_params["MessageDeduplicationId"] = message_deduplication_id
+            response = self.sqs_client.send_message(**message_params)
+
+            APP_LOGGER.info(
+                f"Message sent successfully to FIFO queue '{self.queue_name}' with Message ID: {response['MessageId']}, "
+                f"MessageGroupId: {message_group_id} and message payload: {self.message_payload}"
+            )
+        except Exception as e:
+            APP_LOGGER.error(f"Error sending message to FIFO queue: {str(e)}")
             raise e
