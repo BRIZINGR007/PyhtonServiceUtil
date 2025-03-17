@@ -20,5 +20,5 @@ class QUEUE_NAMES(StrEnum):
 
 QUEUE_CONFIG: Dict[str, Dict[str, bool]] = {
     QUEUE_NAMES.APP_001_AI_SERVICE: dict(fifo=False),
-    QUEUE_NAMES.APP_001_AI_DUB_LAMBDA: dict(fifo=False),
+    QUEUE_NAMES.APP_001_AI_DUB_LAMBDA: dict(fifo=True),
 }
