@@ -15,10 +15,10 @@ evaluation-service=yourname-evaluation-service
 
 class QUEUE_NAMES(StrEnum):
     APP_001_AI_SERVICE = "app001-ai-service"
-    APP_001_AI_DUB_LAMBDA = "app001-ai-dub-lambda"
+    APP_001_MEDIA_SERVICE = "app001-media-service"
 
 
 QUEUE_CONFIG: Dict[str, Dict[str, bool]] = {
     QUEUE_NAMES.APP_001_AI_SERVICE: dict(fifo=False),
-    QUEUE_NAMES.APP_001_AI_DUB_LAMBDA: dict(fifo=True),
+    QUEUE_NAMES.APP_001_MEDIA_SERVICE: dict(fifo=False),
 }
