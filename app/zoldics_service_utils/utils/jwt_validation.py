@@ -13,7 +13,6 @@ from ..interfaces.interfaces_th import Jwk_TH
 
 
 class JwtValdationUtils:
-    JWT_ALGORITHM = "RS256" if EnvStore().auth_token_algorithm == "RS256" else "HS256"
 
     @staticmethod
     def is_token_expired(token: str) -> bool:
