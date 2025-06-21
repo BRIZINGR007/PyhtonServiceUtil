@@ -54,14 +54,16 @@ class JwtValdationUtils:
                 default_options.update(verify_aud=False)
 
             unverified_header = jwt.get_unverified_header(token)
-            public_key = cls._get_public_key(unverified_header["kid"])
-
-            if not public_key:
-                raise ValueError("No matching public key found")
+            if JWT_ALGORITHM == "RS256":
+                key = cls._get_public_key(unverified_header["kid"])
+                if not key:
+                    raise ValueError("No matching public key found")
+            else:
+                key = EnvStore().jwks
 
             return jwt.decode(
                 token,
-                public_key,
+                key,
                 algorithms=[JWT_ALGORITHM],
                 options=default_options,
             )
